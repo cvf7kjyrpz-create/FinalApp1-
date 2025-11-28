@@ -47,10 +47,19 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,0.6);
 }
 
+.stat-box.small {
+    padding: 8px 10px;
+    min-height: 28px;
+}
+
 .stat-title {
   font-size: 12px;
   opacity: 0.7;
   margin-bottom: 4px;
+}
+
+.stat-box.small .stat-title {
+    font-size: 10px;
 }
 
 .stat-value {
@@ -58,21 +67,34 @@ body {
   font-weight: bold;
 }
 
-/************* BUTTON-BEREICH *************/
-.buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-    flex-wrap: wrap;
+.stat-box.small .stat-value {
+    font-size: 16px;
 }
 
-.btn {
-    background: #202020;
-    border: 1px solid #333;
-    padding: 8px 10px;
-    border-radius: 6px;
-    color: white;
+/************* BUTTON-BEREICH *************/
+.buttons {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 900px) {
+    .buttons {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.btn.block-btn {
+    padding: 12px 10px;
+    min-height: 56px;
     font-size: 13px;
+    background: linear-gradient(180deg, #151515, #1b1b1b);
+    border-radius: 12px;
+    border: 1px solid #333;
+    color: white;
+    flex: 1;
+    text-align: center;
 }
 
 /************* TABELLE *************/
@@ -169,21 +191,22 @@ td {
 
 <div class="header">
 
-    <!-- STATS -->
+    <!-- STATS (obere Kacheln, klein) -->
     <div class="stats">
-        <div class="stat-box"><div class="stat-title">Artikel</div><div class="stat-value" id="countItems">0</div></div>
-        <div class="stat-box"><div class="stat-title">Gesamtstücke</div><div class="stat-value" id="countTotal">0</div></div>
-        <div class="stat-box"><div class="stat-title">Wert gelagert</div><div class="stat-value" id="valueStored">0€</div></div>
-        <div class="stat-box"><div class="stat-title">Wert gesamt</div><div class="stat-value" id="valueTotal">0€</div></div>
+        <div class="stat-box small"><div class="stat-title">Artikel</div><div class="stat-value" id="countItems">0</div></div>
+        <div class="stat-box small"><div class="stat-title">Gesamtstücke</div><div class="stat-value" id="countTotal">0</div></div>
+        <div class="stat-box small"><div class="stat-title">Wert gelagert</div><div class="stat-value" id="valueStored">0€</div></div>
+        <div class="stat-box small"><div class="stat-title">Wert gesamt</div><div class="stat-value" id="valueTotal">0€</div></div>
     </div>
 
-    <!-- BUTTONS -->
+    <!-- BUTTONS (unten, gleiche Größe wie Kacheln) -->
     <div class="buttons">
-        <button class="btn" onclick="openPopup()">Artikel anlegen</button>
-        <button class="btn" onclick="backupExport()">Backup Export</button>
-        <button class="btn" onclick="backupImport()">Backup Import</button>
-        <button class="btn" onclick="createPDF()">Inventur PDF</button>
+        <button class="btn block-btn" onclick="openPopup()">Artikel anlegen</button>
+        <button class="btn block-btn" onclick="backupExport()">Backup Export</button>
+        <button class="btn block-btn" onclick="backupImport()">Backup Import</button>
+        <button class="btn block-btn" onclick="createPDF()">Inventur PDF</button>
     </div>
+
 </div>
 
 
@@ -240,23 +263,14 @@ td {
 
 
 <script>
-/*****************************************************
-       LOKALE DATENBANK
-*****************************************************/
 let items = JSON.parse(localStorage.getItem("lagerItems") || "[]");
 let editIndex = null;
 
-/*****************************************************
-       ARTIKELNUMMER GENERATOR
-*****************************************************/
 function generateArticleNumber() {
     let num = items.length + 1;
     return String(num).padStart(3, "0") + " - 2025";
 }
 
-/*****************************************************
-       POPUP ÖFFNEN + SCHLIESSEN
-*****************************************************/
 function openPopup(edit = false, index = null) {
     editIndex = index;
 
@@ -290,9 +304,6 @@ function closePopup() {
     document.getElementById("popupArticle").style.display = "none";
 }
 
-/*****************************************************
-       ARTIKEL SPEICHERN
-*****************************************************/
 function saveArticle() {
     let nr = document.getElementById("articleNr").value;
     let name = document.getElementById("articleName").value;
@@ -318,25 +329,19 @@ function saveArticle() {
 }
 
 function saveItem(nr, name, qty, size, total, singlePrice, place, date, note, img) {
-
     let entry = { nr, name, qty, size, total, singlePrice, place, date, note, img };
-
     if (editIndex !== null) {
         items[editIndex] = entry;
         editIndex = null;
     } else {
         items.push(entry);
     }
-
     localStorage.setItem("lagerItems", JSON.stringify(items));
     closePopup();
     renderTable();
     updateStats();
 }
 
-/*****************************************************
-       TABELLE RENDERN
-*****************************************************/
 function renderTable() {
     let tbody = document.querySelector("#itemTable tbody");
     tbody.innerHTML = "";
@@ -359,7 +364,6 @@ function renderTable() {
             <td class="icon" onclick="showImage('${item.img || ""}')">🖼️</td>
             <td class="icon" onclick="confirmDelete(${i})">🗑️</td>
         `;
-
         tbody.appendChild(tr);
     });
 }
@@ -372,9 +376,6 @@ function updateQty(i, value) {
     updateStats();
 }
 
-/*****************************************************
-       DATUM FORMATIEREN (TT-MM-JJJJ)
-*****************************************************/
 function formatDate(d) {
     if (!d) return "";
     let k = new Date(d);
@@ -383,9 +384,6 @@ function formatDate(d) {
             k.getFullYear();
 }
 
-/*****************************************************
-       LÖSCHEN MIT SICHERHEIT
-*****************************************************/
 function confirmDelete(i) {
     if (confirm("Wirklich löschen?")) {
         items.splice(i, 1);
@@ -395,9 +393,6 @@ function confirmDelete(i) {
     }
 }
 
-/*****************************************************
-       BILD ANZEIGEN
-*****************************************************/
 function showImage(src) {
     if (!src) return alert("Kein Bild hinterlegt!");
     document.getElementById("imagePreview").src = src;
@@ -408,9 +403,6 @@ document.getElementById("popupImage").onclick = () => {
     document.getElementById("popupImage").style.display = "none";
 };
 
-/*****************************************************
-       STATS BERECHNEN
-*****************************************************/
 function updateStats() {
     let count = items.length;
     let totalQty = items.reduce((s,a)=>s+a.qty,0);
@@ -423,9 +415,6 @@ function updateStats() {
     document.getElementById("valueTotal").innerText = totalValue.toFixed(2)+"€";
 }
 
-/*****************************************************
-       BACKUP EXPORT
-*****************************************************/
 function backupExport() {
     let blob = new Blob([JSON.stringify(items)], {type: "application/json"});
     let url = URL.createObjectURL(blob);
@@ -436,9 +425,6 @@ function backupExport() {
     a.click();
 }
 
-/*****************************************************
-       BACKUP IMPORT
-*****************************************************/
 function backupImport() {
     let inp = document.createElement("input");
     inp.type = "file";
@@ -459,16 +445,11 @@ function backupImport() {
     inp.click();
 }
 
-/*****************************************************
-       PDF EXPORT (Inventur)
-*****************************************************/
 function createPDF() {
     let text = "Inventur\n\n";
-
     items.forEach(it => {
         text += `${it.nr} | ${it.name} | ${it.qty} Stk | ${it.total}€\n`;
     });
-
     let blob = new Blob([text], {type: "text/plain"});
     let url = URL.createObjectURL(blob);
 
@@ -478,10 +459,8 @@ function createPDF() {
     a.click();
 }
 
-/*****************************************************/
 renderTable();
 updateStats();
-/*****************************************************/
 </script>
 
 </body>

@@ -23,46 +23,44 @@ body {
     z-index: 10;
 }
 
-/* STATS KACHELN 2x2 */
+/* STATS KACHELN 2x2 - Höhe schmaler, füllt Platz */
 .stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   justify-items: center;
   margin-bottom: 10px;
-}
-
-@media(min-width: 900px) {
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  height: 120px;
 }
 
 .stat-box {
   background: linear-gradient(180deg, #151515, #1b1b1b);
   border-radius: 12px;
-  padding: 8px 12px;
+  padding: 6px 10px;
   color: white;
   min-width: 70px;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .stat-box.small .stat-title { font-size: 10px; }
 .stat-box.small .stat-value { font-size: 16px; font-weight: bold; }
 
-/* UNTERE BUTTONS - vertikal */
+/* UNTERE BUTTONS - Höhe schmaler, gleiche Breite wie Stats */
 .buttons-vertical {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: 6px;
 }
 
 .buttons-vertical .block-btn {
-  width: 80%;
-  min-height: 40px;
+  width: 90%;
+  min-height: 36px;
   font-size: 13px;
   border-radius: 12px;
   border: 1px solid #333;

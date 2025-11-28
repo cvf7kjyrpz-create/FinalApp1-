@@ -49,13 +49,13 @@ body {
 .stat-box.small .stat-title { font-size: 10px; }
 .stat-box.small .stat-value { font-size: 14px; font-weight: bold; }
 
-/* UNTERE BUTTONS - schmaler, gleiche Breite wie Stats */
+/* UNTERE BUTTONS - Abstand nach oben vergrößert */
 .buttons-vertical {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  margin-top: 2px;
+  margin-top: 10px; /* mehr Abstand zu Stats */
 }
 
 .buttons-vertical .block-btn {
@@ -73,7 +73,7 @@ body {
 /* TABELLE - Container weiter unten, Kopf sichtbar */
 .table-container {
     position: fixed;
-    top: 160px; /* vorher 200px -> jetzt kompakter */
+    top: 160px;
     bottom: 0;
     left: 0;
     right: 0;

@@ -23,13 +23,19 @@ body {
     z-index: 10;
 }
 
-/* STATS KACHELN */
+/* STATS KACHELN 2x2 */
 .stats {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  flex-wrap: wrap;
+  justify-items: center;
   margin-bottom: 10px;
+}
+
+@media(min-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .stat-box {
@@ -68,7 +74,7 @@ body {
 /* TABELLE */
 .table-container {
     position: fixed;
-    top: 250px;
+    top: 260px;
     bottom: 0;
     left: 0;
     right: 0;
@@ -147,7 +153,6 @@ td {
 
 /* BILD POPUP */
 #imagePreview { max-width: 90%; border-radius: 12px; }
-
 </style>
 </head>
 <body>

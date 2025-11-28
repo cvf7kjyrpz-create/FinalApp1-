@@ -23,22 +23,22 @@ body {
     z-index: 10;
 }
 
-/* STATS KACHELN 2x2 - Höhe reduziert */
+/* STATS KACHELN 2x2 - Höhe reduziert, Breite wie Buttons */
 .stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 6px;
   justify-items: center;
   margin-bottom: 6px;
-  height: 90px;
+  height: 80px; /* schmaler */
 }
 
 .stat-box {
   background: linear-gradient(180deg, #151515, #1b1b1b);
   border-radius: 12px;
-  padding: 4px 8px; 
+  padding: 3px 6px; /* schmaler */
   color: white;
-  min-width: 70px;
+  width: 85%; /* gleiche Breite wie Buttons */
   text-align: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   display: flex;
@@ -49,7 +49,7 @@ body {
 .stat-box.small .stat-title { font-size: 10px; }
 .stat-box.small .stat-value { font-size: 14px; font-weight: bold; }
 
-/* UNTERE BUTTONS - schmaler */
+/* UNTERE BUTTONS - noch schmaler */
 .buttons-vertical {
   display: flex;
   flex-direction: column;
@@ -59,21 +59,21 @@ body {
 }
 
 .buttons-vertical .block-btn {
-  width: 85%;
-  min-height: 30px;
+  width: 85%; /* gleiche Breite wie obere Stats */
+  min-height: 28px; /* schmaler */
   font-size: 12px;
   border-radius: 12px;
   border: 1px solid #333;
   background: linear-gradient(180deg, #151515, #1b1b1b);
   color: white;
   text-align: center;
-  padding: 4px 0;
+  padding: 3px 0;
 }
 
 /* TABELLE */
 .table-container {
     position: fixed;
-    top: 200px; /* höher gesetzt, mehr Tabelle sichtbar */
+    top: 200px; /* Platz für Header + Stats + Buttons */
     bottom: 0;
     left: 0;
     right: 0;
@@ -104,7 +104,7 @@ td {
 
 /* ICONS */
 .icon {
-    font-size: 14px; /* kleiner, schön und klickbar */
+    font-size: 14px; /* kleiner */
     padding: 2px 4px;
     cursor: pointer;
     display: inline-block;

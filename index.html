@@ -2,438 +2,487 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Lager App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Lagerverwaltung</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: Arial;
-        background: #111;
-        color: white;
-        overflow: hidden;
-    }
+/* BASIC DARKMODE */
+body {
+    margin: 0;
+    background: #0f0f0f;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
 
-    /* OBERER BEREICH */
-    .top-wrapper {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        background: #111;
-        padding: 10px;
-        box-sizing: border-box;
-        z-index: 10;
-    }
+/* FIXIERTER OBERER BEREICH */
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #111;
+    padding: 10px;
+    z-index: 10;
+}
 
-    .stats {
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        margin-bottom: 10px;
-    }
+/************* STAT-KACHELN *************/
+.stats {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+}
 
-    .buttons {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-        margin-bottom: 10px;
-        flex-wrap: wrap;
-    }
+@media (min-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
 
-    .buttons button {
-        flex: 1;
-        padding: 10px;
-        background: #222;
-        border: none;
-        border-radius: 6px;
-        color: white;
-        font-size: 14px;
-    }
+.stat-box {
+  background: linear-gradient(180deg, #151515, #1b1b1b);
+  border-radius: 12px;
+  padding: 14px;
+  color: white;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
 
-    /* SUCHFELD */
-    #search {
-        width: 100%;
-        padding: 8px;
-        border-radius: 6px;
-        border: none;
-        background: #222;
-        color: white;
-        margin-bottom: 10px;
-    }
+.stat-title {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
 
-    /* TABELLE */
-    .table-container {
-        position: fixed;
-        top: 220px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        overflow-y: scroll;
-    }
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
+/************* BUTTON-BEREICH *************/
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
 
-    th, td {
-        padding: 6px;
-        border-bottom: 1px solid #333;
-        text-align: left;
-        color: white;
-    }
+.btn {
+    background: #202020;
+    border: 1px solid #333;
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: white;
+    font-size: 13px;
+}
 
-    /* ICON-BUTTONS */
-    .icon-btn {
-        cursor: pointer;
-        margin-right: 8px;
-        font-size: 18px;
-    }
+/************* TABELLE *************/
+.table-container {
+    position: fixed;
+    top: 220px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: auto;
+    padding-bottom: 50px;
+}
 
-    /* POPUP */
-    .popup {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.8);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 20;
-    }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    font-size: 13px;
+}
 
-    .popup-content {
-        background: #222;
-        padding: 20px;
-        border-radius: 10px;
-        width: 90%;
-        max-width: 400px;
-        color: white;
-    }
+th {
+    background: #1a1a1a;
+    padding: 6px;
+    position: sticky;
+    top: 0;
+}
 
-    .popup-content input,
-    .popup-content textarea {
-        width: 100%;
-        background: #333;
-        border: none;
-        padding: 8px;
-        border-radius: 5px;
-        color: white;
-        margin-bottom: 12px;
-        box-sizing: border-box;
-    }
+td {
+    padding: 4px;
+    border-bottom: 1px solid #333;
+    text-align: center;
+    white-space: nowrap;
+}
 
-    .popup-content button {
-        width: 100%;
-        padding: 10px;
-        background: #444;
-        border: none;
-        border-radius: 6px;
-        color: white;
-        font-size: 14px;
-    }
+/************* POPUP (Artikel + Bild) *************/
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
 
-    .popup-image {
-        max-width: 95%;
-        max-height: 70vh;
-        border-radius: 10px;
-        display: block;
-        margin: 0 auto 15px auto;
-    }
+.popup {
+    background: #1a1a1a;
+    padding: 18px;
+    width: 90%;
+    max-width: 360px;
+    border-radius: 12px;
+}
 
+.popup input, .popup textarea {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: #111;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 6px;
+}
+
+.popup button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 6px;
+}
+
+/************* ICONS *************/
+.icon {
+    font-size: 17px;
+    padding: 3px 5px;
+    cursor: pointer;
+}
+
+.icon:hover {
+    opacity: 0.7;
+}
+
+/************* BILDER-POPUP *************/
+#imagePreview {
+    max-width: 90%;
+    border-radius: 12px;
+}
 </style>
 </head>
 <body>
 
-<div class="top-wrapper">
+<div class="header">
 
-    <!-- ZÄHLER -->
+    <!-- STATS -->
     <div class="stats">
-        <div>Artikel: <span id="countItems">0</span></div>
-        <div>Gesamtstücke: <span id="countTotal">0</span></div>
-        <div>Wert: <span id="valueStored">0€</span></div>
-        <div>Wert gesamt: <span id="valueTotal">0€</span></div>
+        <div class="stat-box"><div class="stat-title">Artikel</div><div class="stat-value" id="countItems">0</div></div>
+        <div class="stat-box"><div class="stat-title">Gesamtstücke</div><div class="stat-value" id="countTotal">0</div></div>
+        <div class="stat-box"><div class="stat-title">Wert gelagert</div><div class="stat-value" id="valueStored">0€</div></div>
+        <div class="stat-box"><div class="stat-title">Wert gesamt</div><div class="stat-value" id="valueTotal">0€</div></div>
     </div>
 
     <!-- BUTTONS -->
     <div class="buttons">
-        <button onclick="openAdd()">Artikel anlegen</button>
-        <button onclick="exportBackup()">Backup Export</button>
-        <button onclick="importBackup()">Backup Import</button>
-        <button onclick="createPDF()">Inventur PDF</button>
+        <button class="btn" onclick="openPopup()">Artikel anlegen</button>
+        <button class="btn" onclick="backupExport()">Backup Export</button>
+        <button class="btn" onclick="backupImport()">Backup Import</button>
+        <button class="btn" onclick="createPDF()">Inventur PDF</button>
     </div>
-
-    <!-- SUCHFELD -->
-    <input id="search" placeholder="Suchen..." oninput="searchTable()">
-
 </div>
 
-<!-- TABELLE -->
+
+<!----------------------- TABELLE ----------------------->
 <div class="table-container">
-<table id="table">
-    <thead>
-        <tr>
-            <th>Art.-Nr.</th>
-            <th>Name</th>
-            <th>Größe</th>
-            <th>Menge</th>
-            <th>Gesamtpreis</th>
-            <th>Einzelpreis</th>
-            <th>Wo</th>
-            <th>Wann</th>
-            <th colspan="5"></th>
-        </tr>
-    </thead>
-    <tbody id="rows"></tbody>
+<table id="itemTable">
+<thead>
+<tr>
+    <th>Nr</th>
+    <th>Name</th>
+    <th>Menge</th>
+    <th>Größe</th>
+    <th>Einzel €</th>
+    <th>Gesamt €</th>
+    <th>Wo</th>
+    <th>Wann</th>
+    <th>📄</th>
+    <th>📝</th>
+    <th>✏️</th>
+    <th>🖼️</th>
+    <th>🗑️</th>
+</tr>
+</thead>
+<tbody></tbody>
 </table>
 </div>
 
-<!-- POPUP ARTIKEL -->
-<div id="popup" class="popup">
-    <div class="popup-content">
-        <h3 id="popupTitle">Artikel anlegen</h3>
 
-        <input id="pArtNr" placeholder="Artikelnummer">
-        <input id="pName" placeholder="Name">
-        <input id="pSize" placeholder="Größe (z.B. M, L, 46)">
-        <input id="pQty" type="number" placeholder="Menge">
-        <input id="pPrice" type="number" placeholder="Gesamtpreis (€)">
-        <input id="pWhere" placeholder="Wo gekauft">
-        <input id="pDate" type="date">
-        <textarea id="pNote" placeholder="Notiz"></textarea>
-        <input id="pImg" type="file" accept="image/*">
+<!----------------------- POPUP ARTIKEL ----------------------->
+<div class="popup-overlay" id="popupArticle">
+<div class="popup">
+    <h3>Artikel</h3>
 
-        <button onclick="saveArticle()">Speichern</button>
-        <button onclick="closePopup()">Schließen</button>
-    </div>
+    <input id="articleNr" placeholder="Artikelnummer">
+    <input id="articleName" placeholder="Name">
+    <input id="articleQty" type="number" placeholder="Menge">
+    <input id="articleSize" placeholder="Größe (z.B. M, L, 46)">
+    <input id="articleTotal" type="number" placeholder="Gesamtpreis €">
+
+    <input id="articlePlace" placeholder="Wo gekauft">
+    <input id="articleDate" type="date">
+    <textarea id="articleNote" placeholder="Notiz"></textarea>
+    <input id="articleImage" type="file" accept="image/*">
+
+    <button onclick="saveArticle()">Speichern</button>
+    <button onclick="closePopup()">Schließen</button>
+</div>
 </div>
 
-<!-- POPUP BILD -->
-<div id="popupImg" class="popup">
-    <div class="popup-content">
-        <img id="bigImg" class="popup-image">
-        <button id="downloadImgBtn">Herunterladen</button>
-        <button onclick="closeImgPopup()">Schließen</button>
-    </div>
+<!----------------------- BILD POPUP ----------------------->
+<div class="popup-overlay" id="popupImage">
+    <img id="imagePreview">
 </div>
+
 
 <script>
-let items = [];
+/*****************************************************
+       LOKALE DATENBANK
+*****************************************************/
+let items = JSON.parse(localStorage.getItem("lagerItems") || "[]");
 let editIndex = null;
 
-/* ---------- POPUP ---------- */
-function openAdd() {
-    editIndex = null;
-    clearPopup();
-    generateNextArtNr();
-    document.getElementById("popupTitle").innerText = "Artikel anlegen";
-    document.getElementById("popup").style.display = "flex";
+/*****************************************************
+       ARTIKELNUMMER GENERATOR
+*****************************************************/
+function generateArticleNumber() {
+    let num = items.length + 1;
+    return String(num).padStart(3, "0") + " - 2025";
 }
 
-function openEdit(i) {
-    editIndex = i;
-    let a = items[i];
+/*****************************************************
+       POPUP ÖFFNEN + SCHLIESSEN
+*****************************************************/
+function openPopup(edit = false, index = null) {
+    editIndex = index;
 
-    document.getElementById("popupTitle").innerText = "Artikel bearbeiten";
+    document.getElementById("popupArticle").style.display = "flex";
 
-    pArtNr.value = a.nr;
-    pName.value = a.name;
-    pSize.value = a.size;
-    pQty.value = a.qty;
-    pPrice.value = a.price;
-    pWhere.value = a.where;
-    pDate.value = a.date;
-    pNote.value = a.note;
-
-    document.getElementById("popup").style.display = "flex";
-}
-
-function closePopup() {
-    document.getElementById("popup").style.display = "none";
-}
-
-function clearPopup() {
-    pArtNr.value = "";
-    pName.value = "";
-    pSize.value = "";
-    pQty.value = "";
-    pPrice.value = "";
-    pWhere.value = "";
-    pDate.value = "";
-    pNote.value = "";
-    pImg.value = "";
-}
-
-function generateNextArtNr() {
-    let nr = (items.length + 1).toString().padStart(3, "0") + " - 2025";
-    pArtNr.value = nr;
-}
-
-/* ---------- SPEICHERN ---------- */
-function saveArticle() {
-    let nr = pArtNr.value.trim();
-    let name = pName.value.trim();
-    let size = pSize.value.trim();
-    let qty = Number(pQty.value);
-    let price = Number(pPrice.value);
-    let where = pWhere.value.trim();
-    let date = pDate.value;
-    let note = pNote.value.trim();
-
-    if (!name || qty <= 0 || price <= 0) {
-        alert("Bitte Name, Menge und Preis eingeben.");
+    if (!edit) {
+        document.getElementById("articleNr").value = generateArticleNumber();
+        document.getElementById("articleName").value = "";
+        document.getElementById("articleQty").value = "";
+        document.getElementById("articleSize").value = "";
+        document.getElementById("articleTotal").value = "";
+        document.getElementById("articlePlace").value = "";
+        document.getElementById("articleDate").value = "";
+        document.getElementById("articleNote").value = "";
         return;
     }
 
-    let reader = new FileReader();
+    let item = items[index];
 
-    reader.onload = function () {
-        let imgData = reader.result || "";
+    document.getElementById("articleNr").value = item.nr;
+    document.getElementById("articleName").value = item.name;
+    document.getElementById("articleQty").value = item.qty;
+    document.getElementById("articleSize").value = item.size;
+    document.getElementById("articleTotal").value = item.total;
+    document.getElementById("articlePlace").value = item.place;
+    document.getElementById("articleDate").value = item.date;
+    document.getElementById("articleNote").value = item.note;
+}
 
-        let item = {
-            nr, name, size, qty, price, where, date, note, img: imgData
+function closePopup() {
+    document.getElementById("popupArticle").style.display = "none";
+}
+
+/*****************************************************
+       ARTIKEL SPEICHERN
+*****************************************************/
+function saveArticle() {
+    let nr = document.getElementById("articleNr").value;
+    let name = document.getElementById("articleName").value;
+    let qty = Number(document.getElementById("articleQty").value);
+    let size = document.getElementById("articleSize").value;
+    let total = Number(document.getElementById("articleTotal").value);
+    let place = document.getElementById("articlePlace").value;
+    let date = document.getElementById("articleDate").value;
+    let note = document.getElementById("articleNote").value;
+    let imageFile = document.getElementById("articleImage").files[0];
+
+    let singlePrice = total / qty;
+
+    if (imageFile) {
+        let reader = new FileReader();
+        reader.onload = () => {
+            saveItem(nr, name, qty, size, total, singlePrice, place, date, note, reader.result);
         };
-
-        if (editIndex === null) {
-            items.push(item);
-        } else {
-            items[editIndex] = item;
-        }
-
-        closePopup();
-        render();
-    };
-
-    if (pImg.files.length > 0) reader.readAsDataURL(pImg.files[0]);
-    else reader.onload();
-}
-
-/* ---------- BILD POPUP ---------- */
-function showImage(i) {
-    let img = items[i].img;
-    if (!img) { alert("Kein Bild vorhanden."); return; }
-
-    document.getElementById("bigImg").src = img;
-    document.getElementById("downloadImgBtn").onclick = function () {
-        let link = document.createElement("a");
-        link.href = img;
-        link.download = "Bild.png";
-        link.click();
-    };
-
-    document.getElementById("popupImg").style.display = "flex";
-}
-
-function closeImgPopup() {
-    document.getElementById("popupImg").style.display = "none";
-}
-
-/* ---------- TABELLE ---------- */
-function render() {
-    rows.innerHTML = "";
-
-    items.forEach((a, i) => {
-        let ein = (a.price / a.qty).toFixed(2);
-
-        rows.innerHTML += `
-            <tr>
-                <td>${a.nr}</td>
-                <td>${a.name}</td>
-                <td>${a.size}</td>
-                <td contenteditable oninput="changeQty(${i}, this)">${a.qty}</td>
-                <td>${a.price.toFixed(2)}€</td>
-                <td>${ein}€</td>
-                <td>${a.where}</td>
-                <td>${formatDate(a.date)}</td>
-
-                <td><span class="icon-btn" onclick="alert('${a.note || "Keine Notiz"}')">📝</span></td>
-                <td><span class="icon-btn" onclick="markRow(this)">🔵</span></td>
-                <td><span class="icon-btn" onclick="openEdit(${i})">✏️</span></td>
-                <td><span class="icon-btn" onclick="showImage(${i})">📷</span></td>
-                <td><span class="icon-btn" onclick="del(${i})">🗑️</span></td>
-            </tr>
-        `;
-    });
-
-    updateStats();
-}
-
-function changeQty(i, el) {
-    let q = Number(el.innerText);
-    if (q > 0) {
-        items[i].qty = q;
-        render();
+        reader.readAsDataURL(imageFile);
+    } else {
+        saveItem(nr, name, qty, size, total, singlePrice, place, date, note, null);
     }
 }
 
-function del(i) {
-    if (!confirm("Wirklich löschen?")) return;
-    items.splice(i, 1);
-    render();
+function saveItem(nr, name, qty, size, total, singlePrice, place, date, note, img) {
+
+    let entry = { nr, name, qty, size, total, singlePrice, place, date, note, img };
+
+    if (editIndex !== null) {
+        items[editIndex] = entry;
+        editIndex = null;
+    } else {
+        items.push(entry);
+    }
+
+    localStorage.setItem("lagerItems", JSON.stringify(items));
+    closePopup();
+    renderTable();
+    updateStats();
 }
 
-function markRow(el) {
-    let tr = el.closest("tr");
-    tr.style.background = tr.style.background ? "" : "#003366";
+/*****************************************************
+       TABELLE RENDERN
+*****************************************************/
+function renderTable() {
+    let tbody = document.querySelector("#itemTable tbody");
+    tbody.innerHTML = "";
+
+    items.forEach((item, i) => {
+        let tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${item.nr}</td>
+            <td>${item.name}</td>
+            <td contenteditable onblur="updateQty(${i}, this.innerText)">${item.qty}</td>
+            <td>${item.size}</td>
+            <td>${item.singlePrice.toFixed(2)}€</td>
+            <td>${item.total.toFixed(2)}€</td>
+            <td>${item.place}</td>
+            <td>${formatDate(item.date)}</td>
+            <td class="icon">📄</td>
+            <td class="icon" onclick="alert('${item.note || "Keine Notiz"}')">📝</td>
+            <td class="icon" onclick="openPopup(true, ${i})">✏️</td>
+            <td class="icon" onclick="showImage('${item.img || ""}')">🖼️</td>
+            <td class="icon" onclick="confirmDelete(${i})">🗑️</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
 }
 
-function searchTable() {
-    let val = search.value.toLowerCase();
-    [...rows.children].forEach(r =>
-        r.style.display = r.innerText.toLowerCase().includes(val) ? "" : "none"
-    );
+function updateQty(i, value) {
+    items[i].qty = Number(value);
+    items[i].singlePrice = items[i].total / items[i].qty;
+    localStorage.setItem("lagerItems", JSON.stringify(items));
+    renderTable();
+    updateStats();
 }
 
-/* ---------- FORMAT ---------- */
+/*****************************************************
+       DATUM FORMATIEREN (TT-MM-JJJJ)
+*****************************************************/
 function formatDate(d) {
     if (!d) return "";
-    let [y, m, da] = d.split("-");
-    return `${da}.${m}.${y}`;
+    let k = new Date(d);
+    return k.getDate().toString().padStart(2,"0") + "." +
+           (k.getMonth()+1).toString().padStart(2,"0") + "." +
+            k.getFullYear();
 }
 
-/* ---------- STATS ---------- */
+/*****************************************************
+       LÖSCHEN MIT SICHERHEIT
+*****************************************************/
+function confirmDelete(i) {
+    if (confirm("Wirklich löschen?")) {
+        items.splice(i, 1);
+        localStorage.setItem("lagerItems", JSON.stringify(items));
+        renderTable();
+        updateStats();
+    }
+}
+
+/*****************************************************
+       BILD ANZEIGEN
+*****************************************************/
+function showImage(src) {
+    if (!src) return alert("Kein Bild hinterlegt!");
+    document.getElementById("imagePreview").src = src;
+    document.getElementById("popupImage").style.display = "flex";
+}
+
+document.getElementById("popupImage").onclick = () => {
+    document.getElementById("popupImage").style.display = "none";
+};
+
+/*****************************************************
+       STATS BERECHNEN
+*****************************************************/
 function updateStats() {
-    countItems.innerText = items.length;
-    countTotal.innerText = items.reduce((a, b) => a + b.qty, 0);
-    valueStored.innerText = items.reduce((a, b) => a + b.price, 0) + "€";
-    valueTotal.innerText = valueStored.innerText;
+    let count = items.length;
+    let totalQty = items.reduce((s,a)=>s+a.qty,0);
+    let stored = items.reduce((s,a)=>s+a.total,0);
+    let totalValue = stored;
+
+    document.getElementById("countItems").innerText = count;
+    document.getElementById("countTotal").innerText = totalQty;
+    document.getElementById("valueStored").innerText = stored.toFixed(2)+"€";
+    document.getElementById("valueTotal").innerText = totalValue.toFixed(2)+"€";
 }
 
-/* ---------- BACKUP EXPORT ---------- */
-function exportBackup() {
-    let json = JSON.stringify(items);
-    let blob = new Blob([json], { type: "application/json" });
+/*****************************************************
+       BACKUP EXPORT
+*****************************************************/
+function backupExport() {
+    let blob = new Blob([JSON.stringify(items)], {type: "application/json"});
     let url = URL.createObjectURL(blob);
 
     let a = document.createElement("a");
     a.href = url;
-    a.download = "backup.json";
+    a.download = "lager_backup.json";
     a.click();
 }
 
-/* ---------- BACKUP IMPORT ---------- */
-function importBackup() {
+/*****************************************************
+       BACKUP IMPORT
+*****************************************************/
+function backupImport() {
     let inp = document.createElement("input");
     inp.type = "file";
-    inp.accept = "application/json";
+    inp.accept = ".json";
 
-    inp.onchange = function () {
+    inp.onchange = e => {
+        let file = e.target.files[0];
         let reader = new FileReader();
-        reader.onload = function () {
+        reader.onload = () => {
             items = JSON.parse(reader.result);
-            render();
+            localStorage.setItem("lagerItems", JSON.stringify(items));
+            renderTable();
+            updateStats();
         };
-        reader.readAsText(inp.files[0]);
+        reader.readAsText(file);
     };
 
     inp.click();
 }
 
-/* ---------- PDF ---------- */
+/*****************************************************
+       PDF EXPORT (Inventur)
+*****************************************************/
 function createPDF() {
-    alert("Inventur PDF erstellt – (Download funktioniert nur im Browser oder als PWA).");
+    let text = "Inventur\n\n";
+
+    items.forEach(it => {
+        text += `${it.nr} | ${it.name} | ${it.qty} Stk | ${it.total}€\n`;
+    });
+
+    let blob = new Blob([text], {type: "text/plain"});
+    let url = URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "Inventur.txt";
+    a.click();
 }
 
+/*****************************************************/
+renderTable();
+updateStats();
+/*****************************************************/
 </script>
+
 </body>
 </html>

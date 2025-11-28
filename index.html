@@ -29,14 +29,14 @@ body {
   grid-template-columns: repeat(2, 1fr);
   gap: 6px;
   justify-items: center;
-  margin-bottom: 6px;
-  height: 80px; /* schmaler */
+  margin-bottom: 4px;
+  height: 75px; /* kompakter */
 }
 
 .stat-box {
   background: linear-gradient(180deg, #151515, #1b1b1b);
   border-radius: 12px;
-  padding: 3px 6px; /* schmaler */
+  padding: 3px 6px;
   color: white;
   width: 85%; /* gleiche Breite wie Buttons */
   text-align: center;
@@ -49,18 +49,18 @@ body {
 .stat-box.small .stat-title { font-size: 10px; }
 .stat-box.small .stat-value { font-size: 14px; font-weight: bold; }
 
-/* UNTERE BUTTONS - noch schmaler */
+/* UNTERE BUTTONS - schmaler, gleiche Breite wie Stats */
 .buttons-vertical {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .buttons-vertical .block-btn {
-  width: 85%; /* gleiche Breite wie obere Stats */
-  min-height: 28px; /* schmaler */
+  width: 85%;
+  min-height: 28px; 
   font-size: 12px;
   border-radius: 12px;
   border: 1px solid #333;
@@ -70,10 +70,10 @@ body {
   padding: 3px 0;
 }
 
-/* TABELLE */
+/* TABELLE - Container weiter unten, Kopf sichtbar */
 .table-container {
     position: fixed;
-    top: 200px; /* Platz für Header + Stats + Buttons */
+    top: 160px; /* vorher 200px -> jetzt kompakter */
     bottom: 0;
     left: 0;
     right: 0;
@@ -104,7 +104,7 @@ td {
 
 /* ICONS */
 .icon {
-    font-size: 14px; /* kleiner */
+    font-size: 14px; 
     padding: 2px 4px;
     cursor: pointer;
     display: inline-block;
@@ -225,7 +225,6 @@ td {
 </div>
 
 <script>
-// SCRIPT wie zuvor
 let items = JSON.parse(localStorage.getItem("lagerItems") || "[]");
 let editIndex = null;
 

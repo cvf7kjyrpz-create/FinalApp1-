@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Lagerverwaltung</title>
-
 <style>
-/* BASIC DARKMODE */
 body {
     margin: 0;
     background: #0f0f0f;
@@ -15,7 +13,7 @@ body {
     overflow: hidden;
 }
 
-/* FIXIERTER OBERER BEREICH */
+/* FIXIERTER HEADER */
 .header {
     position: fixed;
     top: 0;
@@ -25,82 +23,52 @@ body {
     z-index: 10;
 }
 
-/************* STAT-KACHELN *************/
+/* STATS KACHELN */
 .stats {
-  display: grid;
+  display: flex;
+  justify-content: center;
   gap: 10px;
-  grid-template-columns: repeat(2, 1fr);
-  width: 100%;
-}
-
-@media (min-width: 900px) {
-  .stats {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 
 .stat-box {
   background: linear-gradient(180deg, #151515, #1b1b1b);
   border-radius: 12px;
-  padding: 14px;
+  padding: 8px 12px;
   color: white;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  min-width: 70px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-.stat-box.small {
-    padding: 8px 10px;
-    min-height: 28px;
+.stat-box.small .stat-title { font-size: 10px; }
+.stat-box.small .stat-value { font-size: 16px; font-weight: bold; }
+
+/* UNTERE BUTTONS - vertikal */
+.buttons-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
 }
 
-.stat-title {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-bottom: 4px;
+.buttons-vertical .block-btn {
+  width: 80%;
+  min-height: 40px;
+  font-size: 13px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  background: linear-gradient(180deg, #151515, #1b1b1b);
+  color: white;
+  text-align: center;
 }
 
-.stat-box.small .stat-title {
-    font-size: 10px;
-}
-
-.stat-value {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.stat-box.small .stat-value {
-    font-size: 16px;
-}
-
-/************* BUTTON-BEREICH *************/
-.buttons {
-    display: grid;
-    gap: 10px;
-    margin-top: 12px;
-    grid-template-columns: repeat(2, 1fr);
-}
-
-@media (min-width: 900px) {
-    .buttons {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-.btn.block-btn {
-    padding: 12px 10px;
-    min-height: 56px;
-    font-size: 13px;
-    background: linear-gradient(180deg, #151515, #1b1b1b);
-    border-radius: 12px;
-    border: 1px solid #333;
-    color: white;
-    flex: 1;
-    text-align: center;
-}
-
-/************* TABELLE *************/
+/* TABELLE */
 .table-container {
     position: fixed;
-    top: 220px;
+    top: 250px;
     bottom: 0;
     left: 0;
     right: 0;
@@ -129,7 +97,7 @@ td {
     white-space: nowrap;
 }
 
-/************* POPUP (Artikel + Bild) *************/
+/* POPUP */
 .popup-overlay {
     display: none;
     position: fixed;
@@ -169,29 +137,24 @@ td {
     border-radius: 6px;
 }
 
-/************* ICONS *************/
+/* ICONS */
 .icon {
     font-size: 17px;
     padding: 3px 5px;
     cursor: pointer;
 }
+.icon:hover { opacity: 0.7; }
 
-.icon:hover {
-    opacity: 0.7;
-}
+/* BILD POPUP */
+#imagePreview { max-width: 90%; border-radius: 12px; }
 
-/************* BILDER-POPUP *************/
-#imagePreview {
-    max-width: 90%;
-    border-radius: 12px;
-}
 </style>
 </head>
 <body>
 
 <div class="header">
 
-    <!-- STATS (obere Kacheln, klein) -->
+    <!-- STATS -->
     <div class="stats">
         <div class="stat-box small"><div class="stat-title">Artikel</div><div class="stat-value" id="countItems">0</div></div>
         <div class="stat-box small"><div class="stat-title">Gesamtstücke</div><div class="stat-value" id="countTotal">0</div></div>
@@ -199,8 +162,8 @@ td {
         <div class="stat-box small"><div class="stat-title">Wert gesamt</div><div class="stat-value" id="valueTotal">0€</div></div>
     </div>
 
-    <!-- BUTTONS (unten, gleiche Größe wie Kacheln) -->
-    <div class="buttons">
+    <!-- BUTTONS vertikal -->
+    <div class="buttons-vertical">
         <button class="btn block-btn" onclick="openPopup()">Artikel anlegen</button>
         <button class="btn block-btn" onclick="backupExport()">Backup Export</button>
         <button class="btn block-btn" onclick="backupImport()">Backup Import</button>
@@ -209,8 +172,7 @@ td {
 
 </div>
 
-
-<!----------------------- TABELLE ----------------------->
+<!-- TABELLE -->
 <div class="table-container">
 <table id="itemTable">
 <thead>
@@ -234,33 +196,28 @@ td {
 </table>
 </div>
 
-
-<!----------------------- POPUP ARTIKEL ----------------------->
+<!-- POPUP ARTIKEL -->
 <div class="popup-overlay" id="popupArticle">
 <div class="popup">
     <h3>Artikel</h3>
-
     <input id="articleNr" placeholder="Artikelnummer">
     <input id="articleName" placeholder="Name">
     <input id="articleQty" type="number" placeholder="Menge">
     <input id="articleSize" placeholder="Größe (z.B. M, L, 46)">
     <input id="articleTotal" type="number" placeholder="Gesamtpreis €">
-
     <input id="articlePlace" placeholder="Wo gekauft">
     <input id="articleDate" type="date">
     <textarea id="articleNote" placeholder="Notiz"></textarea>
     <input id="articleImage" type="file" accept="image/*">
-
     <button onclick="saveArticle()">Speichern</button>
     <button onclick="closePopup()">Schließen</button>
 </div>
 </div>
 
-<!----------------------- BILD POPUP ----------------------->
+<!-- BILD POPUP -->
 <div class="popup-overlay" id="popupImage">
     <img id="imagePreview">
 </div>
-
 
 <script>
 let items = JSON.parse(localStorage.getItem("lagerItems") || "[]");
@@ -268,88 +225,68 @@ let editIndex = null;
 
 function generateArticleNumber() {
     let num = items.length + 1;
-    return String(num).padStart(3, "0") + " - 2025";
+    return String(num).padStart(3,"0")+" - 2025";
 }
 
-function openPopup(edit = false, index = null) {
-    editIndex = index;
-
-    document.getElementById("popupArticle").style.display = "flex";
-
-    if (!edit) {
-        document.getElementById("articleNr").value = generateArticleNumber();
-        document.getElementById("articleName").value = "";
-        document.getElementById("articleQty").value = "";
-        document.getElementById("articleSize").value = "";
-        document.getElementById("articleTotal").value = "";
-        document.getElementById("articlePlace").value = "";
-        document.getElementById("articleDate").value = "";
-        document.getElementById("articleNote").value = "";
+function openPopup(edit=false, index=null){
+    editIndex=index;
+    document.getElementById("popupArticle").style.display="flex";
+    if(!edit){
+        document.getElementById("articleNr").value=generateArticleNumber();
+        document.getElementById("articleName").value="";
+        document.getElementById("articleQty").value="";
+        document.getElementById("articleSize").value="";
+        document.getElementById("articleTotal").value="";
+        document.getElementById("articlePlace").value="";
+        document.getElementById("articleDate").value="";
+        document.getElementById("articleNote").value="";
         return;
     }
-
     let item = items[index];
-
-    document.getElementById("articleNr").value = item.nr;
-    document.getElementById("articleName").value = item.name;
-    document.getElementById("articleQty").value = item.qty;
-    document.getElementById("articleSize").value = item.size;
-    document.getElementById("articleTotal").value = item.total;
-    document.getElementById("articlePlace").value = item.place;
-    document.getElementById("articleDate").value = item.date;
-    document.getElementById("articleNote").value = item.note;
+    document.getElementById("articleNr").value=item.nr;
+    document.getElementById("articleName").value=item.name;
+    document.getElementById("articleQty").value=item.qty;
+    document.getElementById("articleSize").value=item.size;
+    document.getElementById("articleTotal").value=item.total;
+    document.getElementById("articlePlace").value=item.place;
+    document.getElementById("articleDate").value=item.date;
+    document.getElementById("articleNote").value=item.note;
 }
 
-function closePopup() {
-    document.getElementById("popupArticle").style.display = "none";
-}
+function closePopup(){ document.getElementById("popupArticle").style.display="none"; }
 
-function saveArticle() {
-    let nr = document.getElementById("articleNr").value;
-    let name = document.getElementById("articleName").value;
-    let qty = Number(document.getElementById("articleQty").value);
-    let size = document.getElementById("articleSize").value;
-    let total = Number(document.getElementById("articleTotal").value);
-    let place = document.getElementById("articlePlace").value;
-    let date = document.getElementById("articleDate").value;
-    let note = document.getElementById("articleNote").value;
-    let imageFile = document.getElementById("articleImage").files[0];
-
+function saveArticle(){
+    let nr=document.getElementById("articleNr").value;
+    let name=document.getElementById("articleName").value;
+    let qty=Number(document.getElementById("articleQty").value);
+    let size=document.getElementById("articleSize").value;
+    let total=Number(document.getElementById("articleTotal").value);
+    let place=document.getElementById("articlePlace").value;
+    let date=document.getElementById("articleDate").value;
+    let note=document.getElementById("articleNote").value;
+    let imageFile=document.getElementById("articleImage").files[0];
     let singlePrice = total / qty;
 
-    if (imageFile) {
-        let reader = new FileReader();
-        reader.onload = () => {
-            saveItem(nr, name, qty, size, total, singlePrice, place, date, note, reader.result);
-        };
+    if(imageFile){
+        let reader=new FileReader();
+        reader.onload=()=>{ saveItem(nr,name,qty,size,total,singlePrice,place,date,note,reader.result); };
         reader.readAsDataURL(imageFile);
-    } else {
-        saveItem(nr, name, qty, size, total, singlePrice, place, date, note, null);
-    }
+    } else { saveItem(nr,name,qty,size,total,singlePrice,place,date,note,null); }
 }
 
-function saveItem(nr, name, qty, size, total, singlePrice, place, date, note, img) {
-    let entry = { nr, name, qty, size, total, singlePrice, place, date, note, img };
-    if (editIndex !== null) {
-        items[editIndex] = entry;
-        editIndex = null;
-    } else {
-        items.push(entry);
-    }
-    localStorage.setItem("lagerItems", JSON.stringify(items));
-    closePopup();
-    renderTable();
-    updateStats();
+function saveItem(nr,name,qty,size,total,singlePrice,place,date,note,img){
+    let entry={nr,name,qty,size,total,singlePrice,place,date,note,img};
+    if(editIndex!==null){ items[editIndex]=entry; editIndex=null; } else { items.push(entry); }
+    localStorage.setItem("lagerItems",JSON.stringify(items));
+    closePopup(); renderTable(); updateStats();
 }
 
-function renderTable() {
-    let tbody = document.querySelector("#itemTable tbody");
-    tbody.innerHTML = "";
-
-    items.forEach((item, i) => {
-        let tr = document.createElement("tr");
-
-        tr.innerHTML = `
+function renderTable(){
+    let tbody=document.querySelector("#itemTable tbody");
+    tbody.innerHTML="";
+    items.forEach((item,i)=>{
+        let tr=document.createElement("tr");
+        tr.innerHTML=`
             <td>${item.nr}</td>
             <td>${item.name}</td>
             <td contenteditable onblur="updateQty(${i}, this.innerText)">${item.qty}</td>
@@ -359,104 +296,57 @@ function renderTable() {
             <td>${item.place}</td>
             <td>${formatDate(item.date)}</td>
             <td class="icon">📄</td>
-            <td class="icon" onclick="alert('${item.note || "Keine Notiz"}')">📝</td>
-            <td class="icon" onclick="openPopup(true, ${i})">✏️</td>
-            <td class="icon" onclick="showImage('${item.img || ""}')">🖼️</td>
-            <td class="icon" onclick="confirmDelete(${i})">🗑️</td>
-        `;
+            <td class="icon" onclick="alert('${item.note || 'Keine Notiz'}')">📝</td>
+            <td class="icon" onclick="openPopup(true,${i})">✏️</td>
+            <td class="icon" onclick="showImage('${item.img||""}')">🖼️</td>
+            <td class="icon" onclick="confirmDelete(${i})">🗑️</td>`;
         tbody.appendChild(tr);
     });
 }
 
-function updateQty(i, value) {
-    items[i].qty = Number(value);
-    items[i].singlePrice = items[i].total / items[i].qty;
-    localStorage.setItem("lagerItems", JSON.stringify(items));
-    renderTable();
-    updateStats();
+function updateQty(i,value){ items[i].qty=Number(value); items[i].singlePrice=items[i].total/items[i].qty; localStorage.setItem("lagerItems",JSON.stringify(items)); renderTable(); updateStats(); }
+
+function formatDate(d){ if(!d) return ""; let k=new Date(d); return k.getDate().toString().padStart(2,"0")+"."+ (k.getMonth()+1).toString().padStart(2,"0")+"."+ k.getFullYear(); }
+
+function confirmDelete(i){ if(confirm("Wirklich löschen?")){ items.splice(i,1); localStorage.setItem("lagerItems",JSON.stringify(items)); renderTable(); updateStats(); } }
+
+function showImage(src){ if(!src) return alert("Kein Bild hinterlegt!"); document.getElementById("imagePreview").src=src; document.getElementById("popupImage").style.display="flex"; }
+document.getElementById("popupImage").onclick=()=>{ document.getElementById("popupImage").style.display="none"; }
+
+function updateStats(){
+    let count=items.length;
+    let totalQty=items.reduce((s,a)=>s+a.qty,0);
+    let stored=items.reduce((s,a)=>s+a.total,0);
+    let totalValue=stored;
+    document.getElementById("countItems").innerText=count;
+    document.getElementById("countTotal").innerText=totalQty;
+    document.getElementById("valueStored").innerText=stored.toFixed(2)+"€";
+    document.getElementById("valueTotal").innerText=totalValue.toFixed(2)+"€";
 }
 
-function formatDate(d) {
-    if (!d) return "";
-    let k = new Date(d);
-    return k.getDate().toString().padStart(2,"0") + "." +
-           (k.getMonth()+1).toString().padStart(2,"0") + "." +
-            k.getFullYear();
+function backupExport(){
+    let blob=new Blob([JSON.stringify(items)],{type:"application/json"});
+    let url=URL.createObjectURL(blob);
+    let a=document.createElement("a"); a.href=url; a.download="lager_backup.json"; a.click();
 }
 
-function confirmDelete(i) {
-    if (confirm("Wirklich löschen?")) {
-        items.splice(i, 1);
-        localStorage.setItem("lagerItems", JSON.stringify(items));
-        renderTable();
-        updateStats();
-    }
-}
-
-function showImage(src) {
-    if (!src) return alert("Kein Bild hinterlegt!");
-    document.getElementById("imagePreview").src = src;
-    document.getElementById("popupImage").style.display = "flex";
-}
-
-document.getElementById("popupImage").onclick = () => {
-    document.getElementById("popupImage").style.display = "none";
-};
-
-function updateStats() {
-    let count = items.length;
-    let totalQty = items.reduce((s,a)=>s+a.qty,0);
-    let stored = items.reduce((s,a)=>s+a.total,0);
-    let totalValue = stored;
-
-    document.getElementById("countItems").innerText = count;
-    document.getElementById("countTotal").innerText = totalQty;
-    document.getElementById("valueStored").innerText = stored.toFixed(2)+"€";
-    document.getElementById("valueTotal").innerText = totalValue.toFixed(2)+"€";
-}
-
-function backupExport() {
-    let blob = new Blob([JSON.stringify(items)], {type: "application/json"});
-    let url = URL.createObjectURL(blob);
-
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = "lager_backup.json";
-    a.click();
-}
-
-function backupImport() {
-    let inp = document.createElement("input");
-    inp.type = "file";
-    inp.accept = ".json";
-
-    inp.onchange = e => {
-        let file = e.target.files[0];
-        let reader = new FileReader();
-        reader.onload = () => {
-            items = JSON.parse(reader.result);
-            localStorage.setItem("lagerItems", JSON.stringify(items));
-            renderTable();
-            updateStats();
-        };
+function backupImport(){
+    let inp=document.createElement("input"); inp.type="file"; inp.accept=".json";
+    inp.onchange=e=>{
+        let file=e.target.files[0];
+        let reader=new FileReader();
+        reader.onload=()=>{ items=JSON.parse(reader.result); localStorage.setItem("lagerItems",JSON.stringify(items)); renderTable(); updateStats(); };
         reader.readAsText(file);
     };
-
     inp.click();
 }
 
-function createPDF() {
-    let text = "Inventur\n\n";
-    items.forEach(it => {
-        text += `${it.nr} | ${it.name} | ${it.qty} Stk | ${it.total}€\n`;
-    });
-    let blob = new Blob([text], {type: "text/plain"});
-    let url = URL.createObjectURL(blob);
-
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = "Inventur.txt";
-    a.click();
+function createPDF(){
+    let text="Inventur\n\n";
+    items.forEach(it=>{ text+=`${it.nr} | ${it.name} | ${it.qty} Stk | ${it.total}€\n`; });
+    let blob=new Blob([text],{type:"text/plain"});
+    let url=URL.createObjectURL(blob);
+    let a=document.createElement("a"); a.href=url; a.download="Inventur.txt"; a.click();
 }
 
 renderTable();

@@ -72,11 +72,10 @@ body {
 
 /* TABELLE */
 .table-container {
-    position: fixed;
-    top: 160px;
-    bottom: 0;
+    position: absolute;
     left: 0;
     right: 0;
+    bottom: 0;
     overflow: auto;
     padding-bottom: 50px;
 }
@@ -187,7 +186,7 @@ th {
 </div>
 
 <!-- TABELLE -->
-<div class="table-container">
+<div class="table-container" id="tableContainer">
 <table id="itemTable">
 <thead>
 <tr>
@@ -232,6 +231,13 @@ th {
 <script>
 let items = JSON.parse(localStorage.getItem("lagerItems") || "[]");
 let editIndex = null;
+
+function adjustTablePosition(){
+    let headerHeight = document.querySelector('.header').offsetHeight;
+    document.getElementById('tableContainer').style.top = headerHeight + "px";
+}
+window.addEventListener('resize', adjustTablePosition);
+adjustTablePosition();
 
 function generateArticleNumber() {
     let num = items.length + 1;

@@ -36,9 +36,9 @@ body {
 }
 .counter-title { font-size: 11px; color: #bbb; }
 .counter-value { font-size: 18px; font-weight: bold; }
-#searchRow {margin-top: 10px;}
+#searchRow {margin-top: 10px; display:flex; justify-content:center;}
 #search {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     border-radius: 8px;
     background: #111;
@@ -111,7 +111,8 @@ td {
 }
 .popup-row label { font-size: 13px; margin-bottom: 2px; }
 .popup-row input, .popup-row textarea {
-    width: 100%;
+    width: 95%;
+    margin: 0 auto;
     padding: 6px;
     border-radius: 6px;
     border: 1px solid #444;
@@ -177,10 +178,10 @@ input.table-input {
 <div class="popup-row"><label>Artikelnummer</label><input id="p_artnr"></div>
 <div class="popup-row"><label>Name</label><input id="p_name"></div>
 <div class="popup-row"><label>Menge</label><input type="number" id="p_menge" min="1" value="1"></div>
-<div class="popup-row"><label>Größe</label><input id="p_groesse" placeholder="z. B. M, L, XL"></div>
+<div class="popup-row"><label>Größe</label><input id="p_groesse" placeholder="z. B. S, M, L, XL"></div>
 <div class="popup-row"><label>Preis</label><input type="number" id="p_preis" step="0.01"></div>
 <div class="popup-row"><label>Wo gekauft</label><input id="p_ort"></div>
-<div class="popup-row"><label>Wann gekauft</label><input type="date" id="p_datum" style="width:100%; text-align:center;"></div>
+<div class="popup-row"><label>Wann gekauft</label><input type="date" id="p_datum" style="width:95%; text-align:center;"></div>
 <div class="popup-row"><label>Bild / Rechnung</label><input type="file" id="p_bild" accept="image/*"></div>
 <div class="popup-row"><label>Notiz</label><textarea id="p_notiz" rows="2"></textarea></div>
 <div style="display: flex; gap: 10px;">
@@ -193,9 +194,54 @@ input.table-input {
 <script>
 let artikel = JSON.parse(localStorage.getItem("lagerData") || "[]");
 let editIndex = null;
+
+// 10 Testartikel hinzufügen, falls Lager leer
+if(artikel.length===0){
+    for(let i=1;i<=10;i++){
+        artikel.push({
+            artnr: `00${i}-2025`,
+            name: `Testartikel ${i}`,
+            menge: i,
+            groesse: ["S","M","L","XL"][i%4],
+            preis: (i*5.5),
+            ort: `Shop ${i}`,
+            datum: `2025-11-${("0"+i).slice(-2)}`,
+            bild: "",
+            notiz: `Notiz ${i}`
+        });
+    }
+    localStorage.setItem("lagerData",JSON.stringify(artikel));
+}
+
 updateCounters(); renderTable();
 
-function openPopup() { document.getElementById("popup").style.display = "block"; }
+// Neue Logik für Artikelnummer
+function getNextArtNr() {
+    const currentYear = new Date().getFullYear();
+    const existing = artikel.filter(a => a.artnr.endsWith(currentYear));
+    let nextNum = 1;
+    if(existing.length>0){
+        const nums = existing.map(a => parseInt(a.artnr.split("-")[0],10));
+        nextNum = Math.max(...nums)+1;
+    }
+    return String(nextNum).padStart(3,'0') + "-" + currentYear;
+}
+
+function openPopup(){
+    document.getElementById("popup").style.display = "block";
+    if(editIndex === null){ // Nur neue Artikel
+        document.getElementById("p_artnr").value = getNextArtNr();
+        document.getElementById("p_name").value = "";
+        document.getElementById("p_menge").value = 1;
+        document.getElementById("p_groesse").value = "";
+        document.getElementById("p_preis").value = "";
+        document.getElementById("p_ort").value = "";
+        document.getElementById("p_datum").value = "";
+        document.getElementById("p_notiz").value = "";
+        document.getElementById("p_bild").value = "";
+    }
+}
+
 function formatDatum(d){ if(!d) return ""; const dt=new Date(d); const tag=("0"+dt.getDate()).slice(-2); const monat=("0"+(dt.getMonth()+1)).slice(-2); const jahr=dt.getFullYear(); return `${tag}-${monat}-${jahr}`; }
 
 function saveArtikel(){
@@ -224,6 +270,8 @@ function saveArtikel(){
         reader.readAsDataURL(bildInput.files[0]);
     } else pushItem("");
 }
+
+// Restliche Funktionen (renderTable, updateCounters, updateMenge, searchTable, export/import, generatePDF, showNote, showImage, deleteItem, toggleMark, openEdit) wie vorher, unverändert
 
 function renderTable(){
     const tbody=document.getElementById("tableBody"); tbody.innerHTML="";
@@ -284,21 +332,39 @@ function importData(){
 function generatePDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    let y=10;
+    const colWidths = [40, 70, 20, 50]; 
+    let startX = 10;
+    let startY = 20;
+    let rowHeight = 8;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Inventur", 105, 10, {align:"center"});
+    const headers = ["ArtNr", "Name", "Menge", "Notiz"];
+    let x = startX;
+    headers.forEach((h,i)=>{
+        doc.rect(x, startY, colWidths[i], rowHeight);
+        doc.text(h, x + 2, startY + 6);
+        x += colWidths[i];
+    });
+    let y = startY + rowHeight;
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text("Inventur",105,10,{align:"center"});
-    artikel.forEach((a,i)=>{
-        y+=6; if(y>280){ doc.addPage(); y=10; }
-        const line=`${i+1}. ${a.artnr} | ${a.name} | Menge: ${a.menge} | Preis: ${a.preis.toFixed(2)}€ | Ort: ${a.ort} | Datum: ${formatDatum(a.datum)} | Größe: ${a.groesse||'-'}`;
-        doc.text(line,10,y);
+    artikel.forEach((a, i) => {
+        x = startX;
+        if(y + rowHeight > 290){ doc.addPage(); y = startY + rowHeight; }
+        const values = [a.artnr, a.name, a.menge.toString(), a.notiz || "-"];
+        values.forEach((v,j)=>{
+            doc.rect(x, y, colWidths[j], rowHeight);
+            let txt = v.length > 25 ? v.substr(0, 25) + "…" : v;
+            doc.text(txt, x + 2, y + 6);
+            x += colWidths[j];
+        });
+        y += rowHeight;
     });
     doc.save("inventur.pdf");
 }
 
-function showNote(i){
-    alert(artikel[i].notiz || "Keine Notiz hinterlegt");
-}
-
+function showNote(i){ alert(artikel[i].notiz || "Keine Notiz hinterlegt"); }
 function showImage(i){
     if(artikel[i].bild){
         const w=window.open("");
@@ -310,18 +376,8 @@ function showImage(i){
         w.document.body.appendChild(img);
     } else alert("Kein Bild vorhanden");
 }
-
-function deleteItem(i){
-    if(confirm("Willst du den Artikel wirklich löschen?")){
-        artikel.splice(i,1); localStorage.setItem("lagerData",JSON.stringify(artikel)); renderTable(); updateCounters();
-    }
-}
-
-function toggleMark(i){
-    const row=document.querySelectorAll("#tableBody tr")[i];
-    row.style.background=row.style.background==''?'#001f44':'';
-}
-
+function deleteItem(i){ if(confirm("Willst du den Artikel wirklich löschen?")){ artikel.splice(i,1); localStorage.setItem("lagerData",JSON.stringify(artikel)); renderTable(); updateCounters(); }}
+function toggleMark(i){ const row=document.querySelectorAll("#tableBody tr")[i]; row.style.background=row.style.background==''?'#001f44':''; }
 function openEdit(i){
     editIndex=i;
     const a=artikel[i];
@@ -336,10 +392,7 @@ function openEdit(i){
     document.getElementById("popup").style.display="block";
 }
 
-function adjustTableTop(){
-    const header=document.getElementById("topbar");
-    document.getElementById("tableContainer").style.top = header.offsetHeight + "px";
-}
+function adjustTableTop(){ const header=document.getElementById("topbar"); document.getElementById("tableContainer").style.top = header.offsetHeight + "px"; }
 window.onload=adjustTableTop;
 window.onresize=adjustTableTop;
 </script>

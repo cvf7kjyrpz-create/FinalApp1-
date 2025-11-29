@@ -239,6 +239,7 @@ function renderTable(){
             <td>${formatDatum(a.datum)}</td>
             <td>
                 <span class="icon-btn" onclick="openEdit(${i})">✏️</span>
+                <span class="icon-btn" onclick="showNote(${i})">📝</span>
                 <span class="icon-btn" onclick="showImage(${i})">📷</span>
                 <span class="icon-btn" onclick="toggleMark(${i})">★</span>
                 <span class="icon-btn" onclick="deleteItem(${i})" style="margin-left:12px;">❌</span>
@@ -294,14 +295,20 @@ function generatePDF(){
     doc.save("inventur.pdf");
 }
 
-function editNote(i){
-    const n=prompt("Notiz bearbeiten:",artikel[i].notiz);
-    if(n!==null){ artikel[i].notiz=n; localStorage.setItem("lagerData",JSON.stringify(artikel)); }
+function showNote(i){
+    alert(artikel[i].notiz || "Keine Notiz hinterlegt");
 }
 
 function showImage(i){
-    if(artikel[i].bild) window.open(artikel[i].bild);
-    else alert("Kein Bild vorhanden");
+    if(artikel[i].bild){
+        const w=window.open("");
+        const img=w.document.createElement("img");
+        img.src=artikel[i].bild;
+        img.style.maxWidth="100%";
+        img.style.height="auto";
+        w.document.body.style.background="#000";
+        w.document.body.appendChild(img);
+    } else alert("Kein Bild vorhanden");
 }
 
 function deleteItem(i){

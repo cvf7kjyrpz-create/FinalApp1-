@@ -1,356 +1,502 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lager App – Final</title>
 
-<title>Lager App</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
+:root {
+  --bg: #0f0f0f;
+  --card: #1a1a1a;
+  --card2: #151515;
+  --text: #ffffff;
+  --accent: #3aa9ff;
+  --border: #333;
+}
 
-/* ============================================= */
-/* GLOBAL DARK MODE */
-/* ============================================= */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #000;
-  color: #fff;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
   overflow: hidden;
 }
 
-/* ============================================= */
-/* FIXIERTER OBERER BEREICH (wie Version davor) */
-/* ============================================= */
-#topbar {
+/* TOP-BEREICH */
+.top-area {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #111;
-  padding: 15px;
-  border-bottom: 2px solid #3aa9ff;
-  z-index: 1000;
-}
-
-#counters {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-
-.counter-box {
-  background: #1a1a1a;
-  padding: 8px 12px;
-  border-radius: 5px;
-  border: 1px solid #3aa9ff;
-}
-
-#controls {
-  display: flex;
-  gap: 8px;
-}
-
-#controls button {
-  background: #1a1a1a;
-  color: white;
-  border: 1px solid #3aa9ff;
-  padding: 8px 10px;
-  border-radius: 5px;
-}
-
-#search {
-  background: #1a1a1a;
-  border: 1px solid #3aa9ff;
-  padding: 8px;
-  color: white;
-  border-radius: 5px;
-  flex: 1;
-}
-
-/* ============================================= */
-/* TABELLE — NICHT UNTER HEADER SCROLLEN */
-/* ============================================= */
-#tableContainer {
-  position: absolute;
-  top: var(--topbar-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
-  overflow-x: auto;
-  background: #000;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  color: white;
-}
-
-thead {
-  position: sticky;
-  top: 0;
-  background: #111;
-}
-
-td, th {
-  padding: 8px;
-  border-bottom: 1px solid #333;
-}
-
-/* ============================================= */
-/* POPUP */
-/* ============================================= */
-#popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #111;
-  padding: 20px;
-  width: 80%;
-  max-width: 380px;
-  border: 2px solid #3aa9ff;
-  border-radius: 8px;
-  z-index: 2000;
-  display: none;
-}
-
-.popup-row {
+  top: 0; left: 0; right: 0;
+  background: var(--bg);
+  padding: 12px;
+  z-index: 100;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
   margin-bottom: 12px;
 }
 
-.popup-row input {
-  padding: 8px;
-  background: #1a1a1a;
-  color: white;
-  border: 1px solid #3aa9ff;
-  border-radius: 5px;
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-align: center;
+  padding: 12px;
+  color: var(--text);
+}
+.stat-card h3 {margin:0;font-size:14px;color:var(--text);}
+.stat-card p {margin:5px 0 0;font-size:18px;font-weight:bold;color:var(--text);}
+
+.btn-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-#popup button {
+button {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  padding: 10px 0;
+  border-radius: 30px;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+}
+button:hover {background: var(--accent); color: #000;}
+
+#search {
   width: 100%;
-  background: #3aa9ff;
-  border: none;
+  max-width: 320px;
   padding: 10px;
-  color: #000;
-  border-radius: 5px;
-  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card2);
+  color: var(--text);
+  margin-bottom: 8px;
 }
 
-</style>
+/* TABELLE */
+.table-wrapper {
+  position: absolute;
+  top: 260px;
+  left:0; right:0; bottom:0;
+  overflow:auto;
+}
 
+table {
+  width:100%;
+  border-collapse: collapse;
+  min-width:900px;
+}
+th, td {
+  padding:8px;
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+  color: var(--text);
+}
+th {
+  background: var(--card2);
+  position: sticky;
+  top:0;
+  z-index:10;
+}
+
+/* POPUP */
+.popup-bg {
+  position: fixed;
+  inset:0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(3px);
+  display: none;
+  z-index: 20000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup {
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  display:flex;
+  flex-direction: column;
+  gap:12px;
+  color: var(--text);
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.popup input,
+.popup textarea {
+  width: 100%;
+  max-width: 100%;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background: var(--card2);
+  color: var(--text);
+  font-size:15px;
+  box-sizing: border-box;
+}
+
+#p-date {width:60%; margin:0 auto; display:block;}
+.popup h2 {text-align:center;color: var(--text);}
+.popup button {flex:1;}
+</style>
 </head>
+
 <body>
 
-<!-- ============================================= -->
-<!-- OBERER BEREICH (ALTE GUTE VERSION) -->
-<!-- ============================================= -->
+<!-- TOP-BEREICH -->
+<div class="top-area">
 
-<div id="topbar">
-
-  <div id="counters">
-    <div class="counter-box">Artikel: <span id="countArticles">0</span></div>
-    <div class="counter-box">Menge: <span id="countQty">0</span></div>
-    <div class="counter-box">Wert: <span id="countValue">0 €</span></div>
-    <div class="counter-box">Wert gesamt: <span id="countValueTotal">0 €</span></div>
+  <div class="stat-grid">
+    <div class="stat-card"><h3>Artikel im Bestand</h3><p id="stat-artikel">0</p></div>
+    <div class="stat-card"><h3>Gegenstände gesamt</h3><p id="stat-anzahl">0</p></div>
+    <div class="stat-card"><h3>Warenwert aktuell</h3><p id="stat-wert">0 €</p></div>
+    <div class="stat-card"><h3>Warenwert insgesamt</h3><p id="stat-wert-total">0 €</p></div>
   </div>
 
-  <div id="controls">
-    <input type="text" id="search" placeholder="Suchen…" oninput="searchTable()">
+  <div class="btn-row">
     <button onclick="openPopup()">Artikel anlegen</button>
-    <button onclick="saveBackup()">Sichern</button>
-    <button onclick="loadBackup()">Laden</button>
-    <button onclick="exportPDF()">PDF</button>
+    <button onclick="generatePDF()">Inventur als PDF</button>
+    <button onclick="saveBackup()">Sicherung speichern</button>
+    <button onclick="loadBackup()">Sicherung laden</button>
   </div>
+
+  <input id="search" placeholder="Suche..." oninput="filterTable()">
 
 </div>
 
-<!-- ============================================= -->
 <!-- TABELLE -->
-<!-- ============================================= -->
-
-<div id="tableContainer">
-  <table id="itemTable">
+<div class="table-wrapper">
+  <table>
     <thead>
       <tr>
-        <th>Nr</th>
-        <th>Name</th>
-        <th>Menge</th>
-        <th>Wert</th>
-        <th>Wert/Stk</th>
-        <th>Wo gekauft</th>
-        <th>Wann gekauft</th>
-        <th>Aktion</th>
+        <th>Nr</th><th>Name</th><th>Menge</th><th>Preis</th>
+        <th>Wert gesamt</th><th>Wo gekauft</th><th>Wann</th><th>Aktionen</th>
       </tr>
     </thead>
-    <tbody id="tableBody">
-    </tbody>
+    <tbody id="table-body"></tbody>
   </table>
 </div>
 
-<!-- ============================================= -->
 <!-- POPUP -->
-<!-- ============================================= -->
+<div class="popup-bg" id="popup-bg">
+  <div class="popup">
 
-<div id="popup">
-  <div class="popup-row">
-    <label>Artikelnummer</label>
-    <input id="p_nr">
+    <h2>Artikel hinzufügen</h2>
+
+    <input id="p-nr" placeholder="Artikelnummer">
+    <input id="p-name" placeholder="Name">
+    <input id="p-date" type="date">
+    <input id="p-where" placeholder="Wo gekauft?">
+    <input id="p-price" type="number" placeholder="Preis">
+    <input id="p-qty" type="number" placeholder="Menge">
+    <textarea id="p-note" placeholder="Notiz"></textarea>
+    <input id="p-img" type="file" multiple>
+
+    <div style="display:flex; gap:10px;">
+      <!-- WICHTIG: SAFARI-SICHER -->
+      <button onclick="saveItem()">Speichern</button>
+      <button onclick="closePopup()">Abbrechen</button>
+    </div>
+
   </div>
-
-  <div class="popup-row">
-    <label>Name</label>
-    <input id="p_name">
-  </div>
-
-  <div class="popup-row">
-    <label>Menge</label>
-    <input id="p_qty" type="number">
-  </div>
-
-  <div class="popup-row">
-    <label>Preis / Stück</label>
-    <input id="p_price" type="number" step="0.01">
-  </div>
-
-  <div class="popup-row">
-    <label>Wo gekauft</label>
-    <input id="p_where">
-  </div>
-
-  <div class="popup-row">
-    <label>Wann gekauft</label>
-    <input id="p_date" type="date">
-  </div>
-
-  <button onclick="saveItem()">Speichern</button>
 </div>
 
 <script>
+/* -------------------------------------------
+   INDEXEDDB INITIALISIERUNG
+------------------------------------------- */
+let db;
+let req = indexedDB.open("LagerDB", 1);
 
-/* ============================================= */
-/* DYNAMISCHE POSITION FÜR TABELLE */
-/* ============================================= */
-function adjustTablePosition() {
-  const topbar = document.getElementById("topbar");
-  const tableContainer = document.getElementById("tableContainer");
-  tableContainer.style.setProperty("--topbar-height", topbar.offsetHeight + "px");
+req.onupgradeneeded = e => {
+  db = e.target.result;
+  if(!db.objectStoreNames.contains("artikel"))
+    db.createObjectStore("artikel", { keyPath: "nr" });
+};
+
+req.onsuccess = e => { db = e.target.result; loadTable(); };
+req.onerror = e => console.error("DB Error:", e);
+
+
+/* -------------------------------------------
+   POPUP
+------------------------------------------- */
+function openPopup() {
+  document.getElementById("popup-bg").style.display = "flex";
+}
+function closePopup() {
+  document.getElementById("popup-bg").style.display = "none";
 }
 
-document.addEventListener("DOMContentLoaded", adjustTablePosition);
-window.addEventListener("resize", adjustTablePosition);
 
-/* ============================================= */
-/* DATENSPEICHERUNG */
-/* ============================================= */
-
-let items = JSON.parse(localStorage.getItem("lagerItems") || "[]");
-
+/* -------------------------------------------
+   ARTIKEL SPEICHERN
+------------------------------------------- */
 function saveItem() {
-  try {
-    const nr = document.getElementById("p_nr").value.trim();
-    const name = document.getElementById("p_name").value.trim();
-    const qty = Number(document.getElementById("p_qty").value);
-    const price = Number(document.getElementById("p_price").value);
-    const where = document.getElementById("p_where").value.trim();
-    const date = document.getElementById("p_date").value;
+  if (!db) return;
 
-    if (!nr || !name) return;
+  let nrField = document.getElementById("p-nr");
+  let nr = nrField.value.trim();
 
-    items.push({ nr, name, qty, price, where, date });
-    localStorage.setItem("lagerItems", JSON.stringify(items));
+  function actuallySave(finalNr) {
+    let name = document.getElementById("p-name").value.trim();
+    let date = document.getElementById("p-date").value;
+    let where = document.getElementById("p-where").value.trim();
+    let price = parseFloat(document.getElementById("p-price").value) || 0;
+    let qty = parseInt(document.getElementById("p-qty").value) || 0;
+    let note = document.getElementById("p-note").value;
+    let files = document.getElementById("p-img").files;
+    let images = [];
 
-    renderTable();
-    closePopup();
-  } catch (e) {
-    alert("Fehler: " + e);
+    function writeToDB() {
+      let tx = db.transaction("artikel", "readwrite");
+      let store = tx.objectStore("artikel");
+      store.put({ nr: finalNr, name, date, where, price, qty, note, images });
+
+      tx.oncomplete = () => {
+        closePopup();
+        clearPopup();
+        loadTable();
+      };
+      tx.onerror = e => alert("Fehler beim Speichern: " + e.target.error);
+    }
+
+    if (files.length > 0) {
+      let loaded = 0;
+      for (let i = 0; i < files.length; i++) {
+        let reader = new FileReader();
+        reader.onload = e => {
+          images.push(e.target.result);
+          loaded++;
+          if (loaded === files.length) writeToDB();
+        };
+        reader.readAsDataURL(files[i]);
+      }
+    } else writeToDB();
+  }
+
+  if (!nr) {
+    let tx = db.transaction("artikel", "readonly");
+    let store = tx.objectStore("artikel");
+    let r = store.getAll();
+
+    r.onsuccess = e => {
+      let items = e.target.result;
+      let maxNr = 0;
+
+      items.forEach(i => {
+        let num = parseInt(i.nr.split("-")[0]);
+        if (num > maxNr) maxNr = num;
+      });
+
+      let newNr = String(maxNr + 1).padStart(3, "0") + "-2025";
+      actuallySave(newNr);
+    };
+    r.onerror = e => alert("Fehler: " + e.target.error);
+  } else {
+    actuallySave(nr);
   }
 }
 
-function renderTable() {
-  const tbody = document.getElementById("tableBody");
+function clearPopup() {
+  ["p-nr","p-name","p-date","p-where","p-price","p-qty","p-note","p-img"]
+  .forEach(id => document.getElementById(id).value = "");
+}
+
+
+/* -------------------------------------------
+   TABELLE LADEN
+------------------------------------------- */
+function loadTable() {
+  let tbody = document.getElementById("table-body");
   tbody.innerHTML = "";
 
-  let totalQty = 0;
+  let tx = db.transaction("artikel", "readonly");
+  let store = tx.objectStore("artikel");
+
   let totalValue = 0;
+  let totalQty = 0;
+  let count = 0;
 
-  items.forEach(item => {
-    totalQty += item.qty;
-    totalValue += item.qty * item.price;
+  store.openCursor().onsuccess = e => {
+    let cursor = e.target.result;
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${item.nr}</td>
-      <td>${item.name}</td>
-      <td>${item.qty}</td>
-      <td>${(item.qty * item.price).toFixed(2)} €</td>
-      <td>${item.price.toFixed(2)} €</td>
-      <td>${item.where}</td>
-      <td>${item.date}</td>
-      <td><button onclick="deleteItem('${item.nr}')">Löschen</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
+    if (cursor) {
+      count++;
+      let a = cursor.value;
+      let val = a.price * a.qty;
 
-  document.getElementById("countArticles").innerText = items.length;
-  document.getElementById("countQty").innerText = totalQty;
-  document.getElementById("countValue").innerText = totalValue.toFixed(2) + " €";
-  document.getElementById("countValueTotal").innerText = totalValue.toFixed(2) + " €";
+      totalValue += val;
+      totalQty += a.qty;
+
+      let tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${a.nr}</td>
+        <td>${a.name}</td>
+        <td>${a.qty}</td>
+        <td>${a.price.toFixed(2)} €</td>
+        <td>${val.toFixed(2)} €</td>
+        <td>${a.where}</td>
+        <td>${a.date}</td>
+        <td><button onclick="deleteItem('${a.nr}')">Löschen</button></td>
+      `;
+
+      tbody.appendChild(tr);
+      cursor.continue();
+    }
+
+    document.getElementById("stat-artikel").innerText = count;
+    document.getElementById("stat-anzahl").innerText = totalQty;
+    document.getElementById("stat-wert").innerText = totalValue.toFixed(2) + " €";
+    document.getElementById("stat-wert-total").innerText = totalValue.toFixed(2) + " €";
+  };
 }
 
+
+/* -------------------------------------------
+   ARTIKEL LÖSCHEN
+------------------------------------------- */
 function deleteItem(nr) {
-  items = items.filter(item => item.nr !== nr);
-  localStorage.setItem("lagerItems", JSON.stringify(items));
-  renderTable();
+  if (!confirm("Artikel löschen?")) return;
+
+  let tx = db.transaction("artikel", "readwrite");
+  let store = tx.objectStore("artikel");
+  store.delete(nr);
+  tx.oncomplete = () => loadTable();
 }
 
-/* ============================================= */
-/* POPUP */
-/* ============================================= */
 
-function openPopup() {
-  document.getElementById("popup").style.display = "block";
+/* -------------------------------------------
+   SUCHFUNKTION
+------------------------------------------- */
+function filterTable() {
+  let q = document.getElementById("search").value.toLowerCase();
+  document.querySelectorAll("#table-body tr").forEach(tr => {
+    tr.style.display =
+      [...tr.children].some(td => td.innerText.toLowerCase().includes(q))
+      ? ""
+      : "none";
+  });
 }
 
-function closePopup() {
-  document.getElementById("popup").style.display = "none";
-}
 
-/* ============================================= */
-/* BACKUP */
-/* ============================================= */
+/* -------------------------------------------
+   BACKUP EXPORT
+------------------------------------------- */
 function saveBackup() {
-  const blob = new Blob([JSON.stringify(items)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "lager_backup.json";
-  a.click();
+  let tx = db.transaction("artikel", "readonly");
+  let store = tx.objectStore("artikel");
+
+  let data = [];
+  store.openCursor().onsuccess = e => {
+    let cursor = e.target.result;
+    if (cursor) {
+      data.push(cursor.value);
+      cursor.continue();
+    } else {
+      let blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "backup_lager.json";
+      a.click();
+    }
+  };
 }
 
+
+/* -------------------------------------------
+   BACKUP IMPORT
+------------------------------------------- */
 function loadBackup() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "application/json";
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      items = JSON.parse(reader.result);
-      localStorage.setItem("lagerItems", JSON.stringify(items));
-      renderTable();
+  let inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = ".json";
+
+  inp.onchange = () => {
+    let file = inp.files[0];
+    let reader = new FileReader();
+
+    reader.onload = e => {
+      let data = JSON.parse(e.target.result);
+
+      let tx = db.transaction("artikel", "readwrite");
+      let store = tx.objectStore("artikel");
+      store.clear();
+
+      data.forEach(item => store.put(item));
+
+      tx.oncomplete = () => loadTable();
     };
+
     reader.readAsText(file);
   };
-  input.click();
+
+  inp.click();
 }
 
-renderTable();
 
+/* -------------------------------------------
+   INVENTUR PDF
+------------------------------------------- */
+function generatePDF() {
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
+
+  doc.setFontSize(12);
+  let y = 10;
+
+  doc.text("Inventur", 10, y);
+  y += 10;
+
+  doc.text("Nr  Name  Menge  Preis  Wert  Wo gekauft  Wann", 10, y);
+  y += 6;
+
+  let tx = db.transaction("artikel", "readonly");
+  let store = tx.objectStore("artikel");
+
+  store.openCursor().onsuccess = e => {
+    let cursor = e.target.result;
+
+    if (cursor) {
+      let a = cursor.value;
+      let v = (a.price * a.qty).toFixed(2);
+
+      y += 6;
+      if (y > 280) {
+        doc.addPage();
+        y = 10;
+      }
+
+      doc.text(
+        `${a.nr}  ${a.name}  ${a.qty}  ${a.price}  ${v}  ${a.where}  ${a.date}`,
+        10,
+        y
+      );
+
+      cursor.continue();
+    } else {
+      doc.save("Inventur.pdf");
+    }
+  };
+}
 </script>
 
 </body>

@@ -23,7 +23,7 @@ body {
     right: 0;
     padding: 15px;
     background: #000;
-    z-index: 9999; /* hoch genug für Touch */
+    z-index: 9999; 
     border-bottom: 2px solid #333;
 }
 
@@ -78,14 +78,14 @@ body {
 #buttonRow button {
     flex: 1;
     padding: 10px;
-    font-size: 11px;       /* kleiner wie Zähler */
-    color: #bbb;           /* gleiche Farbe wie Zähler */
+    font-size: 11px;       
+    color: #bbb;           
     border-radius: 10px;
     background: #000;
     border: 1px solid #444;
     font-weight: bold;
     box-shadow: 0 4px 10px rgba(0,0,0,0.45);
-    pointer-events: auto;  /* iPhone touch fix */
+    pointer-events: auto;  
 }
 
 #buttonRow button:active {
@@ -114,8 +114,8 @@ th {
     top: 0;
     z-index: 5;
     padding: 9px;
-    color: #bbb;          /* gleiche Farbe wie Zähler */
-    font-size: 11px;      /* gleiche Größe wie Zähler */
+    color: #bbb;          
+    font-size: 11px;      
     font-weight: bold;
 }
 
@@ -131,13 +131,15 @@ td {
     left: 50%;
     transform: translate(-50%, -50%);
     background: #111;
-    padding: 18px;
+    padding: 15px;
     border: 2px solid #444;
     border-radius: 12px;
     width: 90%;
     max-width: 380px;
+    max-height: 90vh;    /* Pop-up passt auf Bildschirm */
+    overflow-y: auto;    /* scrollbar wenn nötig */
     display: none;
-    z-index: 10000; /* über allen Buttons */
+    z-index: 10000;      
 }
 
 .popup-row {
@@ -170,8 +172,8 @@ td {
     color: white;
     font-weight: bold;
     margin-top: 10px;
+    pointer-events: auto;  
 }
-
 </style>
 </head>
 
@@ -407,7 +409,7 @@ function generatePDF() {
     alert("PDF folgt im nächsten Schritt.");
 }
 
-/* DYNAMISCHE TABELLE UNTER HEADER */
+/* TABELLE UNTER HEADER */
 function adjustTableTop() {
     const header = document.getElementById("topbar");
     const tableContainer = document.getElementById("tableContainer");

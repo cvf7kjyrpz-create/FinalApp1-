@@ -100,6 +100,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
+    table-layout: auto; 
 }
 
 th {
@@ -138,10 +139,11 @@ td {
 
 .popup-row {
     margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
 }
 
 .popup-row label {
-    display: block;
     font-size: 13px;
     margin-bottom: 2px;
 }
@@ -158,6 +160,7 @@ td {
     box-sizing: border-box;
 }
 
+/* Buttons Pop-up */
 #popup button {
     padding: 8px;
     border-radius: 8px;
@@ -168,6 +171,7 @@ td {
     font-size: 13px;
 }
 
+/* Icons in Tabelle */
 .icon-btn {
     cursor: pointer;
     margin-left: 4px;
@@ -223,8 +227,6 @@ td {
     <th>Preis</th>
     <th>Ort</th>
     <th>Gekauft</th>
-    <th>Bild</th>
-    <th>Notiz</th>
     <th>Aktionen</th>
 </tr>
 </thead>
@@ -260,7 +262,7 @@ td {
     </div>
     <div class="popup-row">
         <label>Wann gekauft</label>
-        <input type="date" id="p_datum">
+        <input type="date" id="p_datum" style="width:100%; text-align:center;">
     </div>
     <div class="popup-row">
         <label>Bild / Rechnung</label>
@@ -282,8 +284,16 @@ let artikel = JSON.parse(localStorage.getItem("lagerData") || "[]");
 updateCounters();
 renderTable();
 
-/* POPUP */
 function openPopup() { document.getElementById("popup").style.display = "block"; }
+
+function formatDatum(d) {
+    if(!d) return "";
+    const dt=new Date(d);
+    const tag=("0"+dt.getDate()).slice(-2);
+    const monat=("0"+(dt.getMonth()+1)).slice(-2);
+    const jahr=dt.getFullYear();
+    return `${tag}-${monat}-${jahr}`;
+}
 
 function saveArtikel() {
     const n = document.getElementById("p_artnr").value.trim();
@@ -309,35 +319,31 @@ function saveArtikel() {
     }
 }
 
-function pushItem(artnr,name,menge,groesse,preis,ort,datum,bild,notiz) {
-    artikel.push({ artnr,name,menge,groesse,preis,ort,datum,bild,notiz });
+function pushItem(artnr,name,menge,groesse,preis,ort,datum,bild,notiz){
+    artikel.push({artnr,name,menge,groesse,preis,ort,datum,bild,notiz});
     localStorage.setItem("lagerData",JSON.stringify(artikel));
-    renderTable();
-    updateCounters();
+    renderTable(); updateCounters();
     document.getElementById("popup").style.display="none";
 }
 
 /* TABLE */
 function renderTable() {
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML="";
+    const tbody=document.getElementById("tableBody"); tbody.innerHTML="";
     artikel.forEach((a,i)=>{
-        let tr=document.createElement("tr");
-        tr.innerHTML = `
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
             <td>${a.artnr}</td>
-            <td>${a.name}</td>
+            <td title="${a.name}">${a.name}</td>
             <td>${a.menge}</td>
             <td>${a.groesse||'-'}</td>
             <td>${a.preis.toFixed(2)}</td>
-            <td>${a.ort}</td>
-            <td>${a.datum}</td>
-            <td>${a.bild? "📷":"-"}</td>
-            <td>${a.notiz}</td>
+            <td title="${a.ort}">${a.ort}</td>
+            <td>${formatDatum(a.datum)}</td>
             <td>
                 <span class="icon-btn" onclick="editNote(${i})">📝</span>
                 <span class="icon-btn" onclick="showImage(${i})">📷</span>
-                <span class="icon-btn" onclick="deleteItem(${i})">❌</span>
-                <span class="icon-btn" onclick="toggleMark(${i})">✅</span>
+                <span class="icon-btn" onclick="toggleMark(${i})">★</span>
+                <span class="icon-btn" onclick="deleteItem(${i})" style="margin-left:6px;">❌</span>
             </td>
         `;
         tbody.appendChild(tr);
@@ -356,48 +362,54 @@ function updateCounters(){
 
 /* SEARCH */
 function searchTable() {
-    const q = document.getElementById("search").value.toLowerCase();
-    const rows = document.querySelectorAll("#artikelTable tbody tr");
-    rows.forEach(r=>{r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";});
+    const q=document.getElementById("search").value.toLowerCase();
+    document.querySelectorAll("#artikelTable tbody tr").forEach(r=>{
+        r.style.display=r.innerText.toLowerCase().includes(q)?'':'none';
+    });
 }
 
 /* EXPORT/IMPORT/PDF */
-function exportData() {
-    const blob = new Blob([JSON.stringify(artikel)],{type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a=document.createElement("a");
+function exportData(){
+    const blob=new Blob([JSON.stringify(artikel)],{type:"application/json"});
+    const url=URL.createObjectURL(blob); const a=document.createElement("a");
     a.href=url; a.download="lager_sicherung.json"; a.click();
 }
-
-function importData() {
+function importData(){
     const inp=document.createElement("input"); inp.type="file"; inp.accept="application/json";
     inp.onchange=e=>{
-        const file=e.target.files[0];
-        const reader=new FileReader();
+        const file=e.target.files[0]; const reader=new FileReader();
         reader.onload=function(){ artikel=JSON.parse(reader.result);
             localStorage.setItem("lagerData",JSON.stringify(artikel));
-            renderTable(); updateCounters(); };
-        reader.readAsText(file);
+            renderTable(); updateCounters();
+        }; reader.readAsText(file);
     }; inp.click();
 }
-
 function generatePDF(){ alert("PDF folgt im nächsten Schritt."); }
 
 /* ICON ACTIONS */
-function editNote(i){ alert("Notiz bearbeiten: "+artikel[i].notiz); }
+function editNote(i){
+    const n=prompt("Notiz bearbeiten:",artikel[i].notiz);
+    if(n!==null){ artikel[i].notiz=n; localStorage.setItem("lagerData",JSON.stringify(artikel)); }
+}
 function showImage(i){ if(artikel[i].bild) window.open(artikel[i].bild); else alert("Kein Bild"); }
-function deleteItem(i){ artikel.splice(i,1); localStorage.setItem("lagerData",JSON.stringify(artikel)); renderTable(); updateCounters(); }
-function toggleMark(i){ const row=document.querySelectorAll("#tableBody tr")[i]; row.style.background=row.style.background==''?'#222':''; }
+function deleteItem(i){
+    if(confirm("Willst du den Artikel wirklich löschen?")){
+        artikel.splice(i,1); localStorage.setItem("lagerData",JSON.stringify(artikel)); renderTable(); updateCounters();
+    }
+}
+function toggleMark(i){
+    const row=document.querySelectorAll("#tableBody tr")[i];
+    row.style.background=row.style.background==''?'#001f44':'';
+}
 
 /* ADJUST TABLE */
 function adjustTableTop() {
     const header=document.getElementById("topbar");
     document.getElementById("tableContainer").style.top = header.offsetHeight + "px";
 }
-window.onload = adjustTableTop;
-window.onresize = adjustTableTop;
+window.onload=adjustTableTop;
+window.onresize=adjustTableTop;
 
 </script>
-
 </body>
 </html>

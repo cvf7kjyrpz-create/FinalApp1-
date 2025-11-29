@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Lager App</title>
 
 <style>
@@ -23,7 +23,7 @@ body {
     right: 0;
     padding: 15px;
     background: #000;
-    z-index: 1000;
+    z-index: 9999; /* hoch genug für Touch */
     border-bottom: 2px solid #333;
 }
 
@@ -72,18 +72,20 @@ body {
     margin-top: 10px;
     display: flex;
     gap: 8px;
+    touch-action: manipulation;
 }
 
 #buttonRow button {
     flex: 1;
     padding: 10px;
     font-size: 11px;       /* kleiner wie Zähler */
-    color: #bbb;            /* gleiche Farbe wie Zähler */
+    color: #bbb;           /* gleiche Farbe wie Zähler */
     border-radius: 10px;
     background: #000;
     border: 1px solid #444;
     font-weight: bold;
     box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+    pointer-events: auto;  /* iPhone touch fix */
 }
 
 #buttonRow button:active {
@@ -135,7 +137,7 @@ td {
     width: 90%;
     max-width: 380px;
     display: none;
-    z-index: 9999;
+    z-index: 10000; /* über allen Buttons */
 }
 
 .popup-row {

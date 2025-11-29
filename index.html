@@ -1,98 +1,419 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
-<title>Speicher-Test</title>
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<title>Lager App</title>
 
 <style>
-body {background:#000;color:#fff;font-family:sans-serif;}
-.popup-bg {
-  position:fixed;inset:0;background:rgba(0,0,0,0.7);
-  display:flex;justify-content:center;align-items:center;
+/* GLOBAL */
+body {
+    margin: 0;
+    background: #000;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
 }
-.popup {
-  background:#111;border:2px solid #3aa9ff;border-radius:10px;
-  width:90%;max-width:360px;padding:20px;
+
+/* FIXED HEADER */
+#topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    background: #000;
+    z-index: 1000;
+    border-bottom: 2px solid #333;
 }
-input {width:100%;margin:8px 0;padding:8px;}
-button {
-  background:#222;color:white;padding:10px;border:1px solid #333;
-  width:48%;border-radius:8px;
+
+/* COUNTER GRID */
+#counterWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
 }
+
+.counter-box {
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 10px;
+    background: #000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+}
+
+.counter-title {
+    font-size: 11px;
+    color: #bbb;
+}
+
+.counter-value {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* SEARCH */
+#searchRow {
+    margin-top: 10px;
+}
+
+#search {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    background: #111;
+    border: 1px solid #444;
+    color: white;
+    box-sizing: border-box;
+}
+
+/* BUTTONS ROW */
+#buttonRow {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+#buttonRow button {
+    flex: 1;
+    padding: 10px;
+    font-size: 11px;       /* kleiner wie Zähler */
+    color: #bbb;            /* gleiche Farbe wie Zähler */
+    border-radius: 10px;
+    background: #000;
+    border: 1px solid #444;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+}
+
+#buttonRow button:active {
+    background: #111;
+}
+
+/* TABLE CONTAINER */
+#tableContainer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #111;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 9px;
+    color: #bbb;          /* gleiche Farbe wie Zähler */
+    font-size: 11px;      /* gleiche Größe wie Zähler */
+    font-weight: bold;
+}
+
+td {
+    padding: 8px;
+    border-bottom: 1px solid #222;
+}
+
+/* POPUP */
+#popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #111;
+    padding: 18px;
+    border: 2px solid #444;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 380px;
+    display: none;
+    z-index: 9999;
+}
+
+.popup-row {
+    margin-bottom: 12px;
+}
+
+.popup-row label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.popup-row input, 
+.popup-row textarea {
+    width: 100%;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #1a1a1a;
+    color: white;
+    box-sizing: border-box;
+}
+
+#popup button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: #000;
+    border: 1px solid #444;
+    color: white;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
 </style>
 </head>
 
 <body>
 
-<h2>TEST – Funktioniert Speichern?</h2>
-<button id="open">Artikel anlegen</button>
+<!-- HEADER -->
+<div id="topbar">
 
-<div class="popup-bg" id="bg" style="display:none;">
-  <div class="popup">
-    <h3>Artikel anlegen</h3>
-    <input id="name" placeholder="Name">
-    <input id="qty" type="number" placeholder="Menge">
-    <div style="display:flex;justify-content:space-between;">
-      <button id="saveBtn">Speichern</button>
-      <button onclick="document.getElementById('bg').style.display='none';">Abbruch</button>
+    <div id="counterWrapper">
+        <div class="counter-box">
+            <div class="counter-title">Artikel im Bestand</div>
+            <div class="counter-value" id="countArtikel">0</div>
+        </div>
+
+        <div class="counter-box">
+            <div class="counter-title">Gegenstände insgesamt</div>
+            <div class="counter-value" id="countMenge">0</div>
+        </div>
+
+        <div class="counter-box">
+            <div class="counter-title">Warenwert aktuell (€)</div>
+            <div class="counter-value" id="countWert">0</div>
+        </div>
+
+        <div class="counter-box">
+            <div class="counter-title">Warenwert gesamt (€)</div>
+            <div class="counter-value" id="countWertTotal">0</div>
+        </div>
     </div>
-  </div>
+
+    <div id="searchRow">
+        <input type="text" id="search" placeholder="Suchen …" oninput="searchTable()">
+    </div>
+
+    <div id="buttonRow">
+        <button onclick="openPopup()">Artikel anlegen</button>
+        <button onclick="exportData()">Sicherung speichern</button>
+        <button onclick="importData()">Sicherung laden</button>
+        <button onclick="generatePDF()">Inventur PDF</button>
+    </div>
+
+</div>
+
+<!-- TABLE -->
+<div id="tableContainer">
+<table id="artikelTable">
+<thead>
+<tr>
+    <th>Artikelnummer</th>
+    <th>Name</th>
+    <th>Menge</th>
+    <th>Größe</th>
+    <th>Preis</th>
+    <th>Ort</th>
+    <th>Gekauft am</th>
+    <th>Bild</th>
+    <th>Notiz</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
+<!-- POPUP -->
+<div id="popup">
+    <div class="popup-row">
+        <label>Artikelnummer</label>
+        <input id="p_artnr">
+    </div>
+
+    <div class="popup-row">
+        <label>Name</label>
+        <input id="p_name">
+    </div>
+
+    <div class="popup-row">
+        <label>Menge</label>
+        <input type="number" id="p_menge" min="1" value="1">
+    </div>
+
+    <div class="popup-row">
+        <label>Größe</label>
+        <input id="p_groesse" placeholder="z. B. M, L, XL">
+    </div>
+
+    <div class="popup-row">
+        <label>Preis</label>
+        <input type="number" id="p_preis" step="0.01">
+    </div>
+
+    <div class="popup-row">
+        <label>Wo gekauft</label>
+        <input id="p_ort">
+    </div>
+
+    <div class="popup-row">
+        <label>Wann gekauft</label>
+        <input type="date" id="p_datum">
+    </div>
+
+    <div class="popup-row">
+        <label>Bild / Rechnung</label>
+        <input type="file" id="p_bild" accept="image/*">
+    </div>
+
+    <div class="popup-row">
+        <label>Notiz</label>
+        <textarea id="p_notiz" rows="3"></textarea>
+    </div>
+
+    <button onclick="saveArtikel()">Speichern</button>
 </div>
 
 <script>
-// -------------------------
-// DATABASE INITIALISIEREN
-// -------------------------
-let db;
-let req = indexedDB.open("TESTDB", 1);
+let artikel = JSON.parse(localStorage.getItem("lagerData") || "[]");
+updateCounters();
+renderTable();
 
-req.onupgradeneeded = e => {
-  db = e.target.result;
-  if (!db.objectStoreNames.contains("artikel"))
-    db.createObjectStore("artikel", { keyPath: "id", autoIncrement: true });
-};
+/* POPUP */
+function openPopup() {
+    document.getElementById("popup").style.display = "block";
+}
 
-req.onsuccess = e => {
-  db = e.target.result;
-  console.log("DB fertig");
-};
+function saveArtikel() {
+    const n = document.getElementById("p_artnr").value.trim();
+    const name = document.getElementById("p_name").value.trim();
+    const menge = Number(document.getElementById("p_menge").value);
+    const groesse = document.getElementById("p_groesse").value.trim();
+    const preis = Number(document.getElementById("p_preis").value);
+    const ort = document.getElementById("p_ort").value.trim();
+    const datum = document.getElementById("p_datum").value;
+    const bildInput = document.getElementById("p_bild");
+    const notiz = document.getElementById("p_notiz").value.trim();
 
-req.onerror = e => alert("DB Fehler: " + e.target.error);
+    if (!n || !name) return;
 
+    if (bildInput.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            pushItem(n,name,menge,groesse,preis,ort,datum,e.target.result,notiz);
+        };
+        reader.readAsDataURL(bildInput.files[0]);
+    } else {
+        pushItem(n,name,menge,groesse,preis,ort,datum,"",notiz);
+    }
+}
 
-// -------------------------
-// POPUP öffnen
-// -------------------------
-document.getElementById("open").addEventListener("click", () => {
-  document.getElementById("bg").style.display = "flex";
-});
+function pushItem(artnr,name,menge,groesse,preis,ort,datum,bild,notiz) {
+    artikel.push({ artnr, name, menge, groesse, preis, ort, datum, bild, notiz });
+    localStorage.setItem("lagerData", JSON.stringify(artikel));
+    renderTable();
+    updateCounters();
+    document.getElementById("popup").style.display = "none";
+}
 
+/* TABLE */
+function renderTable() {
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+    artikel.forEach(a=>{
+        let tr=document.createElement("tr");
+        tr.innerHTML = `
+            <td>${a.artnr}</td>
+            <td>${a.name}</td>
+            <td>${a.menge}</td>
+            <td>${a.groesse || '-'}</td>
+            <td>${a.preis.toFixed(2)}</td>
+            <td>${a.ort}</td>
+            <td>${a.datum}</td>
+            <td>${a.bild ? "📷" : "-"}</td>
+            <td>${a.notiz}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 
-// -------------------------
-// SAFARI-SICHERES SPEICHERN
-// -------------------------
-document.getElementById("saveBtn").addEventListener("click", async () => {
-  if (!db) {
-    alert("DB nicht bereit");
-    return;
-  }
+/* COUNTER UPDATE */
+function updateCounters() {
+    document.getElementById("countArtikel").innerText = artikel.length;
 
-  let name = document.getElementById("name").value.trim();
-  let qty = parseInt(document.getElementById("qty").value) || 0;
+    let menge = 0;
+    let wert = 0;
+    artikel.forEach(a=>{
+        menge += a.menge;
+        wert += a.menge * a.preis;
+    });
 
-  let tx = db.transaction("artikel", "readwrite");
-  let store = tx.objectStore("artikel");
+    document.getElementById("countMenge").innerText = menge;
+    document.getElementById("countWert").innerText = wert.toFixed(2);
+    document.getElementById("countWertTotal").innerText = wert.toFixed(2);
+}
 
-  store.add({ name, qty });
+/* SEARCH */
+function searchTable() {
+    const q = document.getElementById("search").value.toLowerCase();
+    const rows = document.querySelectorAll("#artikelTable tbody tr");
+    rows.forEach(r=>{
+        r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+    });
+}
 
-  tx.oncomplete = () => {
-    alert("Artikel gespeichert!");
-    document.getElementById("bg").style.display = "none";
-  };
+/* EXPORT */
+function exportData() {
+    const blob = new Blob([JSON.stringify(artikel)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "lager_sicherung.json";
+    a.click();
+}
 
-  tx.onerror = e => alert("Speicherfehler: " + e.target.error);
-});
+/* IMPORT */
+function importData() {
+    const inp = document.createElement("input");
+    inp.type = "file";
+    inp.accept = "application/json";
+    inp.onchange = e=>{
+        const file=e.target.files[0];
+        const reader=new FileReader();
+        reader.onload=function(){
+            artikel = JSON.parse(reader.result);
+            localStorage.setItem("lagerData",JSON.stringify(artikel));
+            renderTable();
+            updateCounters();
+        };
+        reader.readAsText(file);
+    };
+    inp.click();
+}
+
+/* PDF */
+function generatePDF() {
+    alert("PDF folgt im nächsten Schritt.");
+}
+
+/* DYNAMISCHE TABELLE UNTER HEADER */
+function adjustTableTop() {
+    const header = document.getElementById("topbar");
+    const tableContainer = document.getElementById("tableContainer");
+    tableContainer.style.top = header.offsetHeight + "px";
+}
+window.onload = adjustTableTop;
+window.onresize = adjustTableTop;
+
 </script>
 
 </body>

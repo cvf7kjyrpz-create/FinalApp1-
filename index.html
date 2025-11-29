@@ -1,63 +1,77 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, user-scalable=no">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
 <title>Lager App</title>
 
 <style>
+
+/* ============================================= */
+/* GLOBAL DARK MODE */
+/* ============================================= */
 body {
   margin: 0;
-  background: #000;
-  color: white;
   font-family: Arial, sans-serif;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
 }
 
-/* OBERER BEREICH */
+/* ============================================= */
+/* FIXIERTER OBERER BEREICH (wie Version davor) */
+/* ============================================= */
 #topbar {
   position: fixed;
-  inset: 0 0 auto 0;
-  background: #000;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #111;
+  padding: 15px;
   border-bottom: 2px solid #3aa9ff;
-  padding: 10px;
   z-index: 1000;
 }
 
-.counterBox {
+#counters {
   display: flex;
   justify-content: space-between;
+  font-size: 14px;
   margin-bottom: 10px;
 }
 
-.counterBox div {
-  background: #111;
-  padding: 10px;
-  border-radius: 8px;
-  width: 24%;
-  text-align: center;
+.counter-box {
+  background: #1a1a1a;
+  padding: 8px 12px;
+  border-radius: 5px;
   border: 1px solid #3aa9ff;
 }
 
 #controls {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
 }
 
-#controls button, #controls input {
-  background: #111;
+#controls button {
+  background: #1a1a1a;
   color: white;
   border: 1px solid #3aa9ff;
-  border-radius: 8px;
-  padding: 10px;
+  padding: 8px 10px;
+  border-radius: 5px;
 }
 
-#controls input {
+#search {
+  background: #1a1a1a;
+  border: 1px solid #3aa9ff;
+  padding: 8px;
+  color: white;
+  border-radius: 5px;
   flex: 1;
 }
 
-/* TABELLE */
+/* ============================================= */
+/* TABELLE — NICHT UNTER HEADER SCROLLEN */
+/* ============================================= */
 #tableContainer {
   position: absolute;
   top: var(--topbar-height);
@@ -66,89 +80,100 @@ body {
   bottom: 0;
   overflow-y: auto;
   overflow-x: auto;
+  background: #000;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  color: white;
 }
 
-table th, table td {
-  border-bottom: 1px solid #444;
-  padding: 10px;
-  text-align: left;
+thead {
+  position: sticky;
+  top: 0;
+  background: #111;
 }
 
+td, th {
+  padding: 8px;
+  border-bottom: 1px solid #333;
+}
+
+/* ============================================= */
 /* POPUP */
-.popup-bg {
+/* ============================================= */
+#popup {
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-.popup {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: #111;
-  border: 2px solid #3aa9ff;
-  border-radius: 12px;
   padding: 20px;
-  width: 90%;
+  width: 80%;
   max-width: 380px;
-}
-
-.popup input, .popup textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  background: #000;
-  border: 1px solid #3aa9ff;
-  color: white;
+  border: 2px solid #3aa9ff;
   border-radius: 8px;
+  z-index: 2000;
+  display: none;
 }
 
-.popup button {
-  background: #111;
-  border: 1px solid #3aa9ff;
-  color: white;
-  padding: 10px;
-  border-radius: 8px;
-  width: 48%;
-  margin-top: 15px;
-}
-
-.popupButtons {
+.popup-row {
   display: flex;
-  gap: 10px;
-  justify-content: space-between;
+  flex-direction: column;
+  margin-bottom: 12px;
 }
-</style>
-</head>
 
+.popup-row input {
+  padding: 8px;
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid #3aa9ff;
+  border-radius: 5px;
+}
+
+#popup button {
+  width: 100%;
+  background: #3aa9ff;
+  border: none;
+  padding: 10px;
+  color: #000;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+</style>
+
+</head>
 <body>
 
-<!-- OBERER BEREICH -->
+<!-- ============================================= -->
+<!-- OBERER BEREICH (ALTE GUTE VERSION) -->
+<!-- ============================================= -->
+
 <div id="topbar">
-  <div class="counterBox">
-    <div>Artikel: <span id="countItems">0</span></div>
-    <div>Menge: <span id="countQty">0</span></div>
-    <div>Wert aktuell: <span id="valueNow">0</span>€</div>
-    <div>Wert gesamt: <span id="valueTotal">0</span>€</div>
+
+  <div id="counters">
+    <div class="counter-box">Artikel: <span id="countArticles">0</span></div>
+    <div class="counter-box">Menge: <span id="countQty">0</span></div>
+    <div class="counter-box">Wert: <span id="countValue">0 €</span></div>
+    <div class="counter-box">Wert gesamt: <span id="countValueTotal">0 €</span></div>
   </div>
 
   <div id="controls">
-    <input id="search" placeholder="Suchen..." oninput="searchTable()">
+    <input type="text" id="search" placeholder="Suchen…" oninput="searchTable()">
     <button onclick="openPopup()">Artikel anlegen</button>
-    <button onclick="backup()">Sichern</button>
-    <button onclick="restore()">Laden</button>
+    <button onclick="saveBackup()">Sichern</button>
+    <button onclick="loadBackup()">Laden</button>
     <button onclick="exportPDF()">PDF</button>
   </div>
+
 </div>
 
+<!-- ============================================= -->
 <!-- TABELLE -->
+<!-- ============================================= -->
+
 <div id="tableContainer">
   <table id="itemTable">
     <thead>
@@ -157,168 +182,176 @@ table th, table td {
         <th>Name</th>
         <th>Menge</th>
         <th>Wert</th>
-        <th>Einzel</th>
-        <th>Gekauft wo</th>
-        <th>Gekauft wann</th>
+        <th>Wert/Stk</th>
+        <th>Wo gekauft</th>
+        <th>Wann gekauft</th>
         <th>Aktion</th>
       </tr>
     </thead>
-    <tbody id="tbody"></tbody>
+    <tbody id="tableBody">
+    </tbody>
   </table>
 </div>
 
-<!-- POPUP ARTIKEL -->
-<div class="popup-bg" id="popup-bg">
-  <div class="popup">
-    <h3>Artikel anlegen</h3>
+<!-- ============================================= -->
+<!-- POPUP -->
+<!-- ============================================= -->
 
-    <input id="p-nr" placeholder="Artikelnummer (optional)">
-    <input id="p-name" placeholder="Name">
-    <input id="p-date" type="date">
-    <input id="p-where" placeholder="Wo gekauft?">
-    <input id="p-price" type="number" placeholder="Preis">
-    <input id="p-qty" type="number" placeholder="Menge">
-    <textarea id="p-note" placeholder="Notiz"></textarea>
-    <input id="p-img" type="file" multiple>
-
-    <div class="popupButtons">
-      <button onclick="saveItem()">Speichern</button>
-      <button onclick="closePopup()">Abbrechen</button>
-    </div>
+<div id="popup">
+  <div class="popup-row">
+    <label>Artikelnummer</label>
+    <input id="p_nr">
   </div>
+
+  <div class="popup-row">
+    <label>Name</label>
+    <input id="p_name">
+  </div>
+
+  <div class="popup-row">
+    <label>Menge</label>
+    <input id="p_qty" type="number">
+  </div>
+
+  <div class="popup-row">
+    <label>Preis / Stück</label>
+    <input id="p_price" type="number" step="0.01">
+  </div>
+
+  <div class="popup-row">
+    <label>Wo gekauft</label>
+    <input id="p_where">
+  </div>
+
+  <div class="popup-row">
+    <label>Wann gekauft</label>
+    <input id="p_date" type="date">
+  </div>
+
+  <button onclick="saveItem()">Speichern</button>
 </div>
 
 <script>
-// -------------------------------------
-//        DYNAMISCHE HÖHENANPASSUNG
-// -------------------------------------
+
+/* ============================================= */
+/* DYNAMISCHE POSITION FÜR TABELLE */
+/* ============================================= */
 function adjustTablePosition() {
-  const h = document.getElementById("topbar").offsetHeight;
-  document.getElementById("tableContainer")
-      .style.setProperty("--topbar-height", h + "px");
+  const topbar = document.getElementById("topbar");
+  const tableContainer = document.getElementById("tableContainer");
+  tableContainer.style.setProperty("--topbar-height", topbar.offsetHeight + "px");
 }
-window.addEventListener("resize", adjustTablePosition);
+
 document.addEventListener("DOMContentLoaded", adjustTablePosition);
+window.addEventListener("resize", adjustTablePosition);
 
-// -------------------------------------
-//             DATABASE SETUP
-// -------------------------------------
-let db;
-let req = indexedDB.open("INVENTAR_DB", 1);
+/* ============================================= */
+/* DATENSPEICHERUNG */
+/* ============================================= */
 
-req.onupgradeneeded = e => {
-  db = e.target.result;
-  db.createObjectStore("artikel", { keyPath: "nr" });
-};
+let items = JSON.parse(localStorage.getItem("lagerItems") || "[]");
 
-req.onsuccess = e => {
-  db = e.target.result;
-  loadTable();
-};
-
-req.onerror = e => alert("DB Fehler: " + e.target.error);
-
-// -------------------------------------
-//             POPUP
-// -------------------------------------
-function openPopup() {
-  document.getElementById("popup-bg").style.display = "flex";
-}
-
-function closePopup() {
-  document.getElementById("popup-bg").style.display = "none";
-}
-
-// -------------------------------------
-//             ARTIKEL SPEICHERN
-// -------------------------------------
 function saveItem() {
-  if (!db) {
-    alert("DB noch nicht bereit!");
-    return;
-  }
+  try {
+    const nr = document.getElementById("p_nr").value.trim();
+    const name = document.getElementById("p_name").value.trim();
+    const qty = Number(document.getElementById("p_qty").value);
+    const price = Number(document.getElementById("p_price").value);
+    const where = document.getElementById("p_where").value.trim();
+    const date = document.getElementById("p_date").value;
 
-  let nrField = document.getElementById("p-nr").value.trim();
-  let finalNr = nrField;
+    if (!nr || !name) return;
 
-  // AUTOMATISCHE ARTIKELNUMMER
-  if (!finalNr) {
-    const tx = db.transaction("artikel", "readonly");
-    const store = tx.objectStore("artikel");
-    let req = store.getAll();
+    items.push({ nr, name, qty, price, where, date });
+    localStorage.setItem("lagerItems", JSON.stringify(items));
 
-    req.onsuccess = () => {
-      let items = req.result;
-      let max = 0;
-      items.forEach(it => {
-        let num = parseInt(it.nr.split("-")[0]);
-        if (num > max) max = num;
-      });
-      finalNr = String(max + 1).padStart(3, "0") + "-2025";
-      saveWithNr(finalNr);
-    };
-  } else {
-    saveWithNr(finalNr);
-  }
-}
-
-function saveWithNr(nr) {
-  let name = document.getElementById("p-name").value.trim();
-  let date = document.getElementById("p-date").value;
-  let where = document.getElementById("p-where").value.trim();
-  let price = parseFloat(document.getElementById("p-price").value) || 0;
-  let qty = parseInt(document.getElementById("p-qty").value) || 0;
-  let note = document.getElementById("p-note").value;
-  let images = [];
-
-  let tx = db.transaction("artikel", "readwrite");
-  let store = tx.objectStore("artikel");
-
-  store.put({ nr, name, date, where, price, qty, note, images });
-
-  tx.oncomplete = () => {
+    renderTable();
     closePopup();
-    loadTable();
-  };
-
-  tx.onerror = e => alert("Speicherfehler: " + e.target.error);
+  } catch (e) {
+    alert("Fehler: " + e);
+  }
 }
 
-// -------------------------------------
-//             TABELLE LADEN
-// -------------------------------------
-function loadTable() {
-  const tbody = document.getElementById("tbody");
+function renderTable() {
+  const tbody = document.getElementById("tableBody");
   tbody.innerHTML = "";
 
-  const tx = db.transaction("artikel", "readonly");
-  const store = tx.objectStore("artikel");
-  let req = store.getAll();
+  let totalQty = 0;
+  let totalValue = 0;
 
-  req.onsuccess = () => {
-    req.result.forEach(item => {
-      let tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${item.nr}</td>
-        <td>${item.name}</td>
-        <td>${item.qty}</td>
-        <td>${(item.qty * item.price).toFixed(2)}</td>
-        <td>${item.price}</td>
-        <td>${item.where}</td>
-        <td>${item.date}</td>
-        <td><button onclick="deleteItem('${item.nr}')">Löschen</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  };
+  items.forEach(item => {
+    totalQty += item.qty;
+    totalValue += item.qty * item.price;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.nr}</td>
+      <td>${item.name}</td>
+      <td>${item.qty}</td>
+      <td>${(item.qty * item.price).toFixed(2)} €</td>
+      <td>${item.price.toFixed(2)} €</td>
+      <td>${item.where}</td>
+      <td>${item.date}</td>
+      <td><button onclick="deleteItem('${item.nr}')">Löschen</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("countArticles").innerText = items.length;
+  document.getElementById("countQty").innerText = totalQty;
+  document.getElementById("countValue").innerText = totalValue.toFixed(2) + " €";
+  document.getElementById("countValueTotal").innerText = totalValue.toFixed(2) + " €";
 }
 
 function deleteItem(nr) {
-  const tx = db.transaction("artikel", "readwrite");
-  tx.objectStore("artikel").delete(nr);
-  tx.oncomplete = loadTable;
+  items = items.filter(item => item.nr !== nr);
+  localStorage.setItem("lagerItems", JSON.stringify(items));
+  renderTable();
 }
 
+/* ============================================= */
+/* POPUP */
+/* ============================================= */
+
+function openPopup() {
+  document.getElementById("popup").style.display = "block";
+}
+
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
+}
+
+/* ============================================= */
+/* BACKUP */
+/* ============================================= */
+function saveBackup() {
+  const blob = new Blob([JSON.stringify(items)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "lager_backup.json";
+  a.click();
+}
+
+function loadBackup() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      items = JSON.parse(reader.result);
+      localStorage.setItem("lagerItems", JSON.stringify(items));
+      renderTable();
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+renderTable();
+
 </script>
+
 </body>
 </html>

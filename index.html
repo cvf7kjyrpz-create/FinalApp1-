@@ -131,13 +131,13 @@ td {
     left: 50%;
     transform: translate(-50%, -50%);
     background: #111;
-    padding: 15px;
+    padding: 12px;
     border: 2px solid #444;
     border-radius: 12px;
-    width: 90%;
-    max-width: 380px;
-    max-height: 90vh;    /* Pop-up passt auf Bildschirm */
-    overflow-y: auto;    /* scrollbar wenn nötig */
+    width: 85%;
+    max-width: 350px;
+    max-height: 85vh;
+    overflow-y: auto;
     display: none;
     z-index: 10000;      
 }
@@ -164,14 +164,12 @@ td {
 }
 
 #popup button {
-    width: 100%;
-    padding: 12px;
+    padding: 10px;
     border-radius: 10px;
     background: #000;
     border: 1px solid #444;
     color: white;
     font-weight: bold;
-    margin-top: 10px;
     pointer-events: auto;  
 }
 </style>
@@ -284,7 +282,11 @@ td {
         <textarea id="p_notiz" rows="3"></textarea>
     </div>
 
-    <button onclick="saveArtikel()">Speichern</button>
+    <!-- BUTTONS -->
+    <div style="display: flex; gap: 10px;">
+        <button onclick="saveArtikel()" style="flex:1;">Speichern</button>
+        <button onclick="document.getElementById('popup').style.display='none'" style="flex:1;">Abbrechen</button>
+    </div>
 </div>
 
 <script>

@@ -150,6 +150,99 @@
 }
 </style>
 
+
+<style>
+/* --- MAXIMAL KOMPAKTE TABELLENZEILEN --- */
+.gridHeader div{
+  font-size:10px;
+}
+
+.gridRow{
+  padding:2px 0;
+}
+
+.name{
+  font-size:11px;
+  line-height:1.05;
+}
+
+.money{
+  font-size:10px;
+}
+
+.gridRow input[type="number"]{
+  padding:2px 4px;
+  font-size:10px;
+  width:44px;
+  text-align:center;
+}
+
+.icons{
+  gap:4px;
+}
+
+.icons .ico{
+  width:22px;
+  height:22px;
+  border-radius:7px;
+}
+
+.icons .ico small{
+  font-size:12px;
+}
+</style>
+
+
+<style>
+/* --- EXTREM KOMPAKT + TRENNLINIEN --- */
+.gridHeader div{
+  font-size:9px;
+}
+
+.gridRow{
+  padding:1px 0;
+  border-bottom:1px solid #222;
+}
+
+.name{
+  font-size:10px;
+  line-height:1.0;
+}
+
+.money{
+  font-size:9px;
+}
+
+.gridRow input[type="number"]{
+  padding:1px 3px;
+  font-size:9px;
+  width:38px;
+  text-align:center;
+}
+
+.icons{
+  gap:3px;
+}
+
+.icons .ico{
+  width:20px;
+  height:20px;
+  border-radius:6px;
+}
+
+.icons .ico small{
+  font-size:11px;
+}
+</style>
+
+
+<style>
+/* --- DURCHGEZOGENE TRENNLINIEN --- */
+.gridRow{
+  border-bottom:1px solid #2a2a2a;
+}
+</style>
+
 </head>
 <body>
 
@@ -245,6 +338,32 @@
   });
 })();
 </script>
+
+
+<!-- ARTIKEL POPUP -->
+<div id="articleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000">
+  <div style="background:#0b0b0b;border:1px solid #333;border-radius:14px;
+              width:92%;max-width:420px;margin:10vh auto;padding:12px">
+    <h3 style="margin:0 0 8px;font-size:14px">Artikel anlegen</h3>
+
+    <label style="font-size:11px;color:#aaa">Artikelname</label>
+    <input id="aName" style="margin-bottom:6px"/>
+
+    <label style="font-size:11px;color:#aaa">Menge</label>
+    <input id="aQty" type="number" inputmode="numeric" value="1" style="margin-bottom:6px"/>
+
+    <label style="font-size:11px;color:#aaa">EK</label>
+    <input id="aEK" type="number" inputmode="decimal" value="0" style="margin-bottom:6px"/>
+
+    <label style="font-size:11px;color:#aaa">VK</label>
+    <input id="aVK" type="number" inputmode="decimal" value="0" style="margin-bottom:10px"/>
+
+    <div style="display:flex;gap:6px">
+      <button id="saveArticle" style="flex:1">Speichern</button>
+      <button id="closeArticle" style="flex:1">Abbrechen</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
